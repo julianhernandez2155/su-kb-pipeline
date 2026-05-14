@@ -1,0 +1,107 @@
+# 15-query eval set for v1.5 chat-interface validation
+# See: next-phase-plan.md Step 1 for methodology, Step 3 for baseline scoring,
+# Step 6 for wiki-augmented scoring.
+#
+# Each query represents realistic SU student / faculty / staff intent.
+# `expected_pages` is the human-curated set of raw page_ids the answer SHOULD draw from.
+# `expected_to_benefit_from_wiki: true` marks queries whose ⚠️/❌ baseline score should improve
+# with the seeded wiki hubs in place.
+
+queries:
+  - id: q01
+    type: factual
+    question: "Can I upload FERPA-protected student data to Claude at Syracuse?"
+    expected_topics: [data classification, Claude, university data]
+    expected_pages: ["488210484", "488144948"]
+
+  - id: q02
+    type: factual
+    question: "How long does Anthropic retain my Claude chats?"
+    expected_topics: [data retention, Claude]
+    expected_pages: ["488210484"]
+
+  - id: q03
+    type: synthesis
+    question: "What AI tools at SU are approved for use with university data?"
+    expected_topics: [approved tools, Claude, Copilot, Gemini]
+    expected_pages: ["488144948", "488210484", "522289260", "498597967"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q04
+    type: synthesis
+    question: "How should I decide between Claude, Copilot, and Gemini for academic work?"
+    expected_topics: [tool comparison, capabilities]
+    expected_pages: ["488210484", "522289260", "498597967", "544538648"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q05
+    type: where-do-i
+    question: "Where do I sign up for Claude at Syracuse?"
+    expected_topics: [Claude access, signup]
+    expected_pages: ["534642749", "483525103"]
+
+  - id: q06
+    type: where-do-i
+    question: "How do I install Claude Code on Windows?"
+    expected_topics: [Claude Code, installation]
+    expected_pages: ["986841103", "540934169"]
+
+  - id: q07
+    type: policy
+    question: "Does the Claude platform train on my data?"
+    expected_topics: [model training, privacy]
+    expected_pages: ["488210484"]
+
+  - id: q08
+    type: policy
+    question: "Can I use Claude while traveling outside the US?"
+    expected_topics: [Claude, geographic restrictions]
+    expected_pages: ["488210484"]
+
+  - id: q09
+    type: factual
+    question: "What is mentorAI and how is it different from regular Claude?"
+    expected_topics: [Clementine, mentorAI]
+    expected_pages: ["544505857", "567279621"]
+
+  - id: q10
+    type: how-to
+    question: "How do I create a new mentor on the Clementine platform?"
+    expected_topics: [Clementine, mentor creation]
+    expected_pages: ["535068673", "567279621"]
+
+  - id: q11
+    type: synthesis
+    question: "What's MCP at Syracuse and how do I use it?"
+    expected_topics: [MCP, Claude connectors, Power BI]
+    expected_pages: ["837517313", "841875458"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q12
+    type: how-to
+    question: "How do I connect Claude to my Microsoft 365 account?"
+    expected_topics: [Claude, M365, connectors]
+    expected_pages: ["544210961", "841875458"]
+
+  - id: q13
+    type: how-to
+    question: "Can I use Google NotebookLM at Syracuse, and what can it do?"
+    expected_topics: [NotebookLM, Gemini]
+    expected_pages: ["530546723", "544538648"]
+
+  - id: q14
+    type: factual
+    question: "Who has access to my AI usage data at Syracuse?"
+    expected_topics: [data access, IT policy]
+    expected_pages: ["488210484"]
+
+  - id: q15
+    type: where-do-i
+    question: "Where can I find example uses of Claude for academic work?"
+    expected_topics: [Claude examples, study uses]
+    expected_pages: ["511246346", "511279124", "500236296", "572194844", "516325410"]
+
+# Rubric for scoring each query (see next-phase-plan.md Step 3):
+#   ✅ Correct + complete — answer is right, all expected info present, citations point at real source pages
+#   ⚠️ Partial            — mostly right but missing a key piece, or citations adjacent-but-not-target
+#   ❌ Wrong / missing    — incorrect, fabricated, or "I don't know" when info exists in corpus

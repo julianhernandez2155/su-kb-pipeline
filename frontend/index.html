@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>su-kb-pipeline — Confluence → Markdown</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="preconnect" href="https://rsms.me/" />
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  <style>
+    :root { font-family: 'Inter', system-ui, sans-serif; }
+    pre, code, .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; }
+    .tag { @apply inline-block px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider; }
+    .row-hover:hover { background-color: rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen text-sm">
+
+<!-- ============== HEADER ============== -->
+<header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-30 backdrop-blur">
+  <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center gap-6">
+    <div class="flex items-baseline gap-2">
+      <span class="font-semibold text-slate-100 text-base">su-kb-pipeline</span>
+      <span class="text-slate-500 text-xs">v1 — Phase 1 / ITSAI</span>
+    </div>
+    <nav class="flex gap-1 ml-4">
+      <button data-tab="pull"    class="tab-btn px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-800">Pull</button>
+      <button data-tab="output"  class="tab-btn px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-800">Output</button>
+      <button data-tab="query"   class="tab-btn px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-800">Query</button>
+      <button data-tab="failures" class="tab-btn px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-800">Failures</button>
+      <button data-tab="config"  class="tab-btn px-3 py-1.5 rounded text-xs font-medium hover:bg-slate-800">Config</button>
+    </nav>
+    <div class="ml-auto flex items-center gap-4 text-xs">
+      <div class="flex items-center gap-2">
+        <span id="authDot" class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
+        <span class="text-slate-400">Auth:</span>
+        <span id="authEmail" class="mono text-slate-300">—</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400">Token:</span>
+        <span id="authToken" class="mono text-slate-300">—</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400">Last API:</span>
+        <span id="lastApi" class="mono text-slate-500">—</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-screen-2xl mx-auto px-6 py-6 space-y-6">
+
+  <!-- ============== TAB: PULL ============== -->
+  <section data-pane="pull" class="space-y-6">
+
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- Space selector -->
+      <div class="col-span-7 bg-slate-900 border border-slate-800 rounded">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+          <h2 class="font-semibold text-slate-100">Spaces <span id="spaceCount" class="text-slate-500 font-normal text-xs ml-2"></span></h2>
+          <span class="text-[11px] text-slate-500">v1 enables only ITSAI · others gated per <span class="mono">sync_config.yaml</span></span>
+        </div>
+        <div class="overflow-auto max-h-[480px]">
+          <table class="w-full text-xs">
+            <thead class="sticky top-0 bg-slate-900 text-slate-400 text-[10px] uppercase tracking-wider">
+              <tr>
+                <th class="text-left px-3 py-2 font-medium">Key</th>
+                <th class="text-left px-3 py-2 font-medium">Name</th>
+                <th class="text-left px-3 py-2 font-medium">Category</th>
+                <th class="text-left px-3 py-2 font-medium">Type</th>
+                <th class="text-right px-3 py-2 font-medium">Pages</th>
+                <th class="text-right px-3 py-2 font-medium">Action</th>
+              </tr>
+            </thead>
+            <tbody id="spaceRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live counters -->
+      <div class="col-span-5 bg-slate-900 border border-slate-800 rounded p-4">
+        <h2 class="font-semibold text-slate-100 mb-3">Live job <span id="jobId" class="text-slate-500 text-xs ml-2 mono"></span></h2>
+        <div id="jobIdle" class="text-slate-500 text-xs italic">No active job. Pick a space and hit Pull.</div>
+        <div id="jobActive" class="hidden space-y-3">
+          <div class="grid grid-cols-5 gap-3">
+            <div class="bg-slate-950 border border-slate-800 rounded p-2">
+              <div class="text-[10px] uppercase tracking-wider text-slate-500">Discovered</div>
+              <div id="ctDiscovered" class="text-xl font-semibold mono">0</div>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded p-2">
+              <div class="text-[10px] uppercase tracking-wider text-slate-500">Converted</div>
+              <div id="ctConverted" class="text-xl font-semibold mono text-emerald-400">0</div>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded p-2">
+              <div class="text-[10px] uppercase tracking-wider text-slate-500">Skipped</div>
+              <div id="ctSkipped" class="text-xl font-semibold mono text-slate-400">0</div>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded p-2">
+              <div class="text-[10px] uppercase tracking-wider text-slate-500">Warned</div>
+              <div id="ctWarned" class="text-xl font-semibold mono text-amber-400">0</div>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded p-2">
+              <div class="text-[10px] uppercase tracking-wider text-slate-500">Failed</div>
+              <div id="ctFailed" class="text-xl font-semibold mono text-rose-400">0</div>
+            </div>
+          </div>
+          <div class="h-2 bg-slate-800 rounded overflow-hidden">
+            <div id="progressBar" class="h-full bg-emerald-500/60 transition-all" style="width:0%"></div>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <div>
+              <span class="text-slate-500">Status:</span>
+              <span id="jobStatus" class="mono text-slate-300">idle</span>
+            </div>
+            <div class="text-slate-500 mono"><span id="jobProgressPct">0%</span> · <span id="jobDuration">0.0s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-page log -->
+    <div class="bg-slate-900 border border-slate-800 rounded">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+        <h2 class="font-semibold text-slate-100">Per-page log</h2>
+        <div class="flex items-center gap-2">
+          <input id="logFilter" type="text" placeholder="Filter title/macro/status…"
+                 class="bg-slate-950 border border-slate-800 text-xs px-2 py-1 rounded w-64 focus:border-slate-600 outline-none" />
+          <select id="logStatusFilter" class="bg-slate-950 border border-slate-800 text-xs px-2 py-1 rounded">
+            <option value="">All</option>
+            <option value="ok">ok</option>
+            <option value="warning">warning</option>
+            <option value="failed">failed</option>
+            <option value="skipped">skipped</option>
+          </select>
+        </div>
+      </div>
+      <div class="overflow-auto max-h-[520px]">
+        <table class="w-full text-xs">
+          <thead class="sticky top-0 bg-slate-900 text-slate-400 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-3 py-2 font-medium">Page ID</th>
+              <th class="text-left px-3 py-2 font-medium">Title</th>
+              <th class="text-left px-3 py-2 font-medium">Status</th>
+              <th class="text-center px-3 py-2 font-medium">Warn</th>
+              <th class="text-center px-3 py-2 font-medium">ADF</th>
+              <th class="text-center px-3 py-2 font-medium">Att.</th>
+              <th class="text-left px-3 py-2 font-medium">Path</th>
+            </tr>
+          </thead>
+          <tbody id="logRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============== TAB: OUTPUT ============== -->
+  <section data-pane="output" class="grid grid-cols-12 gap-6 hidden">
+    <div class="col-span-4 bg-slate-900 border border-slate-800 rounded">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+        <h2 class="font-semibold text-slate-100">Output tree</h2>
+        <button id="refreshOutput" class="text-xs text-slate-400 hover:text-slate-100">refresh</button>
+      </div>
+      <div class="overflow-auto max-h-[700px]">
+        <table class="w-full text-xs">
+          <thead class="sticky top-0 bg-slate-900 text-slate-400 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-3 py-2 font-medium">Page</th>
+              <th class="text-right px-3 py-2 font-medium">Signal</th>
+            </tr>
+          </thead>
+          <tbody id="outputRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-span-8 bg-slate-900 border border-slate-800 rounded">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="font-semibold text-slate-100" id="previewTitle">— select a page —</h2>
+          <div id="previewMeta" class="text-[11px] text-slate-500 mono mt-0.5"></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button data-view="rendered" class="view-btn px-2 py-1 text-xs rounded bg-slate-800">Rendered</button>
+          <button data-view="markdown" class="view-btn px-2 py-1 text-xs rounded">Markdown</button>
+          <button data-view="frontmatter" class="view-btn px-2 py-1 text-xs rounded">Frontmatter</button>
+          <button data-view="storage" class="view-btn px-2 py-1 text-xs rounded">Storage XML</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-0 overflow-auto max-h-[700px]" id="previewBody">
+        <div id="previewLeft" class="prose prose-invert prose-sm max-w-none p-4 border-r border-slate-800 col-span-2"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============== TAB: QUERY ============== -->
+  <section data-pane="query" class="grid grid-cols-12 gap-6 hidden">
+
+    <!-- Status / mode strip -->
+    <div class="col-span-12 bg-slate-900 border border-slate-800 rounded px-4 py-3 flex items-center gap-6 text-xs flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="text-slate-500">Mode:</span>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="radio" name="queryMode" value="raw" class="accent-emerald-500"> raw only
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="radio" name="queryMode" value="raw+wiki" class="accent-emerald-500" checked> raw + wiki
+        </label>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-500">Corpus:</span>
+        <span id="qRawCount" class="mono text-slate-300">— raw</span>
+        <span class="text-slate-600">·</span>
+        <span id="qWikiCount" class="mono text-slate-300">— wiki</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-500">API key:</span>
+        <span id="qApiKey" class="mono text-slate-300">—</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-500">Model:</span>
+        <span id="qModel" class="mono text-slate-300">—</span>
+      </div>
+      <div class="ml-auto flex items-center gap-3 text-slate-500">
+        <span>Session cost:</span>
+        <span id="qSessionCost" class="mono text-slate-300">$0.0000</span>
+        <span class="text-slate-600">·</span>
+        <span id="qSessionTurns" class="mono text-slate-300">0 turns</span>
+        <button id="qClear" class="ml-3 px-2 py-1 text-[11px] rounded bg-slate-800 hover:bg-slate-700">clear</button>
+      </div>
+    </div>
+
+    <!-- Saved sessions sidebar -->
+    <div class="col-span-3 bg-slate-900 border border-slate-800 rounded">
+      <div class="px-3 py-2 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-100 text-xs uppercase tracking-wider">Saved chats <span id="qSessionsCount" class="text-slate-500 ml-1"></span></h2>
+        <button id="qSessionsRefresh" class="text-[10px] text-slate-400 hover:text-slate-100">refresh</button>
+      </div>
+      <div id="qSessionsList" class="overflow-auto max-h-[600px]"></div>
+      <div class="px-3 py-2 border-t border-slate-800 text-[10px] text-slate-500">
+        Save the current chat with the button above the input.
+      </div>
+    </div>
+
+    <!-- Conversation history -->
+    <div class="col-span-9 bg-slate-900 border border-slate-800 rounded">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h2 class="font-semibold text-slate-100" id="qConvTitle">Conversation</h2>
+          <span id="qActiveSession" class="text-[10px] mono text-emerald-400"></span>
+        </div>
+        <span id="qIdleHint" class="text-[11px] text-slate-500 italic">Type a question below — Claude answers from the loaded corpus only.</span>
+      </div>
+      <div id="qHistory" class="overflow-auto max-h-[520px] p-4 space-y-4"></div>
+    </div>
+
+    <!-- Input -->
+    <div class="col-span-12 bg-slate-900 border border-slate-800 rounded p-4">
+      <div class="flex gap-3 items-start">
+        <textarea id="qInput" rows="2" placeholder="e.g. Can I upload FERPA-protected student data to Claude at Syracuse?"
+                  class="flex-1 bg-slate-950 border border-slate-800 text-sm px-3 py-2 rounded mono focus:border-slate-600 outline-none resize-y"></textarea>
+        <div class="flex flex-col gap-2">
+          <button id="qSubmit" class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium whitespace-nowrap">
+            Ask
+          </button>
+          <button id="qSave" class="px-4 py-1 rounded bg-slate-700 hover:bg-slate-600 text-slate-100 text-[11px] font-medium whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+            Save chat
+          </button>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
+        <span>Ctrl+Enter to submit · citations resolve in the Output tab · Save persists to <span class="mono">output/query-sessions/</span></span>
+        <span id="qLastLatency" class="mono"></span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============== TAB: FAILURES ============== -->
+  <section data-pane="failures" class="grid grid-cols-12 gap-6 hidden">
+    <div class="col-span-5 bg-slate-900 border border-slate-800 rounded">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+        <h2 class="font-semibold text-slate-100">Dead-letter <span id="failuresCount" class="text-slate-500 text-xs ml-2"></span></h2>
+        <button id="refreshFailures" class="text-xs text-slate-400 hover:text-slate-100">refresh</button>
+      </div>
+      <div class="overflow-auto max-h-[700px]">
+        <table class="w-full text-xs">
+          <thead class="sticky top-0 bg-slate-900 text-slate-400 text-[10px] uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-3 py-2 font-medium">Page ID</th>
+              <th class="text-left px-3 py-2 font-medium">Title</th>
+              <th class="text-left px-3 py-2 font-medium">Error</th>
+            </tr>
+          </thead>
+          <tbody id="failuresRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-span-7 bg-slate-900 border border-slate-800 rounded">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-100" id="failureTitle">— select a failure —</h2>
+        <button id="retryBtn" class="hidden px-3 py-1 text-xs rounded bg-emerald-600 hover:bg-emerald-500 text-white">Retry this page</button>
+      </div>
+      <div id="failureBody" class="p-4 overflow-auto max-h-[700px] text-xs mono space-y-3"></div>
+    </div>
+  </section>
+
+
+  <!-- ============== TAB: CONFIG ============== -->
+  <section data-pane="config" class="hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="font-semibold text-slate-100">sync_config.yaml</h2>
+        <span class="text-[11px] text-slate-500 mono" id="configPath"></span>
+      </div>
+      <pre id="configYaml" class="text-xs p-4 overflow-auto max-h-[600px] mono whitespace-pre"></pre>
+      <div class="px-4 py-3 border-t border-slate-800 text-xs text-slate-500">
+        Edit on disk to change. v1 does not support UI editing.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============ state ============
+const state = {
+  spaces: [],
+  currentJobId: null,
+  pollTimer: null,
+  pageRows: [],
+  currentPreview: null,
+  currentFailure: null,
+  view: 'rendered',
+};
+
+const $ = (id) => document.getElementById(id);
+
+// ============ tabs ============
+const tabs = ['pull','output','query','failures','config'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+function switchTab(name) {
+  tabs.forEach(t => {
+    document.querySelector(`[data-pane="${t}"]`).classList.toggle('hidden', t !== name);
+    document.querySelector(`[data-tab="${t}"]`).classList.toggle('bg-slate-800', t === name);
+    document.querySelector(`[data-tab="${t}"]`).classList.toggle('text-slate-100', t === name);
+  });
+  if (name === 'output') loadOutput();
+  if (name === 'query') loadQueryStatus();
+  if (name === 'failures') loadFailures();
+  if (name === 'config') loadConfig();
+}
+switchTab('pull');
+
+// ============ auth ============
+async function loadAuth() {
+  const r = await fetch('/api/auth/status').then(r => r.json()).catch(() => ({}));
+  $('authEmail').textContent = r.email || '(missing)';
+  $('authToken').textContent = r.token_loaded ? 'loaded' : 'missing';
+  $('authDot').className = `inline-block w-2 h-2 rounded-full ${
+    r.token_loaded && r.email ? 'bg-emerald-500' : 'bg-rose-500'
+  }`;
+}
+loadAuth();
+
+// ============ spaces ============
+async function loadSpaces() {
+  const r = await fetch('/api/spaces').then(r => r.json()).catch(() => ({spaces:[]}));
+  state.spaces = r.spaces || [];
+  $('spaceCount').textContent = `${state.spaces.length} accessible · ${(r.enabled_keys||[]).length} enabled`;
+  const tbody = $('spaceRows');
+  tbody.innerHTML = '';
+  state.spaces.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-t border-slate-800 row-hover ' + (s.enabled ? '' : 'opacity-40');
+    tr.innerHTML = `
+      <td class="px-3 py-1.5 mono">${s.key}</td>
+      <td class="px-3 py-1.5">${escapeHtml(s.name||'')}</td>
+      <td class="px-3 py-1.5 text-slate-400">${escapeHtml(s.category||'')}</td>
+      <td class="px-3 py-1.5 text-slate-400">${escapeHtml(s.type||'')}</td>
+      <td class="px-3 py-1.5 text-right mono">${s.pages_current}</td>
+      <td class="px-3 py-1.5 text-right">
+        ${s.enabled
+          ? `<button data-key="${s.key}" class="pull-btn px-3 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-medium">Pull</button>`
+          : `<span title="Phase 2+ — see sync_config.yaml" class="text-[10px] text-slate-500 italic">gated</span>`}
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  document.querySelectorAll('.pull-btn').forEach(btn => {
+    btn.addEventListener('click', () => startPull(btn.dataset.key));
+  });
+}
+loadSpaces();
+
+// ============ pull job ============
+async function startPull(key) {
+  document.querySelectorAll('.pull-btn').forEach(b => b.disabled = true);
+  $('logRows').innerHTML = '';
+  ['ctDiscovered','ctConverted','ctSkipped','ctWarned','ctFailed'].forEach(id => $(id).textContent = '0');
+  $('progressBar').style.width = '0%';
+  $('jobProgressPct').textContent = '0%';
+  $('jobIdle').classList.add('hidden');
+  $('jobActive').classList.remove('hidden');
+  $('jobStatus').textContent = 'starting';
+
+  const r = await fetch(`/api/spaces/${encodeURIComponent(key)}/pull`, {method:'POST'})
+    .then(r => r.json()).catch(e => ({error: String(e)}));
+  if (r.error || !r.job_id) {
+    $('jobStatus').textContent = `error: ${r.detail || r.error || 'unknown'}`;
+    document.querySelectorAll('.pull-btn').forEach(b => b.disabled = false);
+    return;
+  }
+  state.currentJobId = r.job_id;
+  $('jobId').textContent = r.job_id;
+  streamJob(r.job_id);
+}
+
+let counters = {discovered:0, converted:0, skipped:0, warned:0, failed:0};
+function resetCounters() { counters = {discovered:0, converted:0, skipped:0, warned:0, failed:0}; }
+
+function streamJob(jobId) {
+  resetCounters();
+  const t0 = Date.now();
+  const tick = setInterval(() => {
+    $('jobDuration').textContent = ((Date.now()-t0)/1000).toFixed(1) + 's';
+  }, 200);
+
+  const es = new EventSource(`/api/jobs/${jobId}/events`);
+  es.addEventListener('started', e => {
+    $('jobStatus').textContent = 'running';
+  });
+  es.addEventListener('discovered', e => {
+    const d = JSON.parse(e.data);
+    counters.discovered = d.page_count;
+    $('ctDiscovered').textContent = counters.discovered;
+  });
+  es.addEventListener('page_converted', e => addLogRow(JSON.parse(e.data), 'converted'));
+  es.addEventListener('page_skipped',   e => addLogRow(JSON.parse(e.data), 'skipped'));
+  es.addEventListener('page_failed',    e => addLogRow(JSON.parse(e.data), 'failed'));
+  es.addEventListener('completed', e => {
+    const d = JSON.parse(e.data);
+    $('jobStatus').textContent = `done · ${d.summary?.duration_s ?? '?'}s`;
+  });
+  es.addEventListener('job_error', e => {
+    const d = JSON.parse(e.data);
+    $('jobStatus').textContent = `error: ${d.error}`;
+  });
+  es.addEventListener('stream_end', e => {
+    clearInterval(tick);
+    es.close();
+    document.querySelectorAll('.pull-btn').forEach(b => b.disabled = false);
+  });
+  es.onerror = (e) => {
+    // EventSource auto-reconnects on transient errors; once the job ends and
+    // the server stops responding, close ourselves.
+    if (es.readyState === EventSource.CLOSED) clearInterval(tick);
+  };
+}
+
+function addLogRow(d, kind) {
+  if (kind === 'converted') {
+    counters.converted++;
+    if (d.warnings_count) counters.warned++;
+  } else if (kind === 'skipped') counters.skipped++;
+  else if (kind === 'failed') counters.failed++;
+
+  ['Discovered','Converted','Skipped','Warned','Failed'].forEach(k => {
+    $('ct'+k).textContent = counters[k.toLowerCase()] || 0;
+  });
+  const processed = counters.converted + counters.skipped + counters.failed;
+  const pct = counters.discovered ? Math.round((processed/counters.discovered)*100) : 0;
+  $('progressBar').style.width = pct + '%';
+  $('jobProgressPct').textContent = pct + '%';
+
+  const tr = document.createElement('tr');
+  tr.className = 'border-t border-slate-800 row-hover';
+  tr.dataset.status = (kind === 'converted') ? (d.status || 'ok') : kind;
+  tr.dataset.search = ((d.title||'') + ' ' + (d.page_id||'')).toLowerCase();
+  const statusBadge =
+    kind === 'converted' && d.status === 'warning' ? 'bg-amber-500/20 text-amber-300' :
+    kind === 'converted' ? 'bg-emerald-500/20 text-emerald-300' :
+    kind === 'skipped'   ? 'bg-slate-700/40 text-slate-300' :
+                           'bg-rose-500/20 text-rose-300';
+  const statusText = kind === 'converted' ? (d.status || 'ok') : kind;
+  tr.innerHTML = `
+    <td class="px-3 py-1.5 mono text-slate-400">${d.page_id || '—'}</td>
+    <td class="px-3 py-1.5">${escapeHtml(d.title||'')}</td>
+    <td class="px-3 py-1.5"><span class="tag ${statusBadge}">${statusText}</span></td>
+    <td class="px-3 py-1.5 text-center mono">${d.warnings_count ?? 0}</td>
+    <td class="px-3 py-1.5 text-center mono">${d.used_adf ? '●' : ''}</td>
+    <td class="px-3 py-1.5 text-center mono">${d.attachment_count ?? 0}</td>
+    <td class="px-3 py-1.5 text-slate-400 mono text-[11px]">${escapeHtml(d.output_path || d.error || '')}</td>`;
+  $('logRows').appendChild(tr);
+  applyLogFilter();
+}
+
+// ============ log filtering ============
+$('logFilter').addEventListener('input', applyLogFilter);
+$('logStatusFilter').addEventListener('change', applyLogFilter);
+function applyLogFilter() {
+  const q = $('logFilter').value.toLowerCase();
+  const s = $('logStatusFilter').value;
+  document.querySelectorAll('#logRows tr').forEach(tr => {
+    const matchQ = !q || tr.dataset.search.includes(q);
+    const matchS = !s || tr.dataset.status === s;
+    tr.style.display = (matchQ && matchS) ? '' : 'none';
+  });
+}
+
+// ============ output ============
+async function loadOutput() {
+  const r = await fetch('/api/pages').then(r => r.json()).catch(() => ({pages:[]}));
+  const tbody = $('outputRows');
+  tbody.innerHTML = '';
+  state.pageRows = r.pages || [];
+  state.pageRows.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-t border-slate-800 cursor-pointer row-hover';
+    tr.addEventListener('click', () => previewPage(p.page_id));
+    const sigColor = p.maintenance_signal === 'fresh' ? 'text-emerald-400'
+                    : p.maintenance_signal === 'aging' ? 'text-amber-400'
+                    : 'text-rose-400';
+    tr.innerHTML = `
+      <td class="px-3 py-1.5">
+        <div class="text-slate-200">${escapeHtml(p.title||'')}</div>
+        <div class="text-[10px] text-slate-500 mono">${p.page_id} · ${escapeHtml((p.ancestor_path||[]).join(' / '))}</div>
+      </td>
+      <td class="px-3 py-1.5 text-right text-[10px] mono ${sigColor}">${p.maintenance_signal||''}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+$('refreshOutput').addEventListener('click', loadOutput);
+
+async function previewPage(pageId) {
+  state.currentPreview = pageId;
+  const r = await fetch(`/api/pages/${pageId}`).then(r => r.json()).catch(() => ({}));
+  $('previewTitle').textContent = r.frontmatter?.title || pageId;
+  $('previewMeta').textContent = `${pageId} · v${r.frontmatter?.version} · ${r.frontmatter?.maintenance_signal} · ${r.path||''}`;
+  state.previewData = r;
+  renderPreview();
+}
+document.querySelectorAll('.view-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    state.view = b.dataset.view;
+    document.querySelectorAll('.view-btn').forEach(x => x.classList.toggle('bg-slate-800', x === b));
+    renderPreview();
+  });
+});
+function renderPreview() {
+  const r = state.previewData;
+  if (!r) return;
+  const left = $('previewLeft');
+  if (state.view === 'rendered') {
+    left.innerHTML = marked.parse(r.markdown || '');
+  } else if (state.view === 'markdown') {
+    left.innerHTML = `<pre class="mono text-xs whitespace-pre-wrap">${escapeHtml(r.markdown || '')}</pre>`;
+  } else if (state.view === 'frontmatter') {
+    left.innerHTML = `<pre class="mono text-xs whitespace-pre-wrap">${escapeHtml(JSON.stringify(r.frontmatter, null, 2))}</pre>`;
+  } else {
+    left.innerHTML = `<pre class="mono text-xs whitespace-pre-wrap">${escapeHtml(r.storage_xml || '(storage XML only retained for dead-lettered pages)')}</pre>`;
+  }
+}
+
+// ============ failures ============
+async function loadFailures() {
+  const r = await fetch('/api/failures').then(r => r.json()).catch(() => ({failures:[]}));
+  $('failuresCount').textContent = `${r.failures.length}`;
+  const tbody = $('failuresRows');
+  tbody.innerHTML = '';
+  r.failures.forEach(f => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-t border-slate-800 cursor-pointer row-hover';
+    tr.addEventListener('click', () => previewFailure(f.page_id));
+    tr.innerHTML = `
+      <td class="px-3 py-1.5 mono text-slate-400">${f.page_id||''}</td>
+      <td class="px-3 py-1.5">${escapeHtml(f.title||'')}</td>
+      <td class="px-3 py-1.5 text-rose-400 text-[11px]">${escapeHtml(f.error||'')}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+$('refreshFailures').addEventListener('click', loadFailures);
+
+async function previewFailure(pageId) {
+  const r = await fetch(`/api/failures/${pageId}`).then(r => r.json()).catch(() => null);
+  state.currentFailure = pageId;
+  if (!r) { $('failureBody').innerHTML = '<div class="text-rose-400">not found</div>'; return; }
+  $('failureTitle').textContent = `${r.page_id} — ${r.title || ''}`;
+  $('retryBtn').classList.remove('hidden');
+  $('failureBody').innerHTML = `
+    <div><span class="text-slate-500">Error:</span> <span class="text-rose-300">${escapeHtml(r.error||'')}</span></div>
+    <div><span class="text-slate-500">Type:</span> ${escapeHtml(r.error_type||'')}</div>
+    <div><span class="text-slate-500">Logged:</span> ${escapeHtml(r.logged_at||'')}</div>
+    <details><summary class="cursor-pointer text-slate-400">Traceback</summary><pre class="bg-slate-950 p-2 mt-2 whitespace-pre-wrap text-[11px]">${escapeHtml(r.traceback||'')}</pre></details>
+    <details><summary class="cursor-pointer text-slate-400">Storage XML</summary><pre class="bg-slate-950 p-2 mt-2 whitespace-pre-wrap text-[11px]">${escapeHtml((r.storage_xml||'').slice(0,4000))}${(r.storage_xml||'').length>4000?'\n…(truncated)':''}</pre></details>
+    ${r.source_url ? `<div class="mt-2"><a href="${r.source_url}" target="_blank" class="text-emerald-400 underline">Open in Confluence</a></div>`:''}
+  `;
+}
+$('retryBtn').addEventListener('click', async () => {
+  if (!state.currentFailure) return;
+  const r = await fetch(`/api/failures/${state.currentFailure}/retry`, {method:'POST'})
+    .then(r => r.json()).catch(e => ({error: String(e)}));
+  if (r.job_id) {
+    switchTab('pull');
+    state.currentJobId = r.job_id;
+    $('jobId').textContent = r.job_id;
+    $('jobIdle').classList.add('hidden');
+    $('jobActive').classList.remove('hidden');
+    streamJob(r.job_id);
+  }
+});
+
+// ============ query ============
+// qState.history is the source of truth — turns get pushed as user asks /
+// Claude answers, and the DOM is repainted from history when loading saved
+// sessions. Save serializes history; Load deserializes into history.
+const qState = {
+  sessionCostUsd: 0,
+  turns: 0,
+  history: [],          // array of {role, text, mode, citations, context_used, cost_usd, latency_ms, raw_pages_loaded, wiki_pages_loaded, timestamp}
+  submitting: false,
+  activeSessionId: null,  // set after Save or Load; null = unsaved fresh chat
+  activeSessionName: null,
+};
+
+async function loadQueryStatus() {
+  const r = await fetch('/api/query/status').then(r => r.json()).catch(() => ({}));
+  $('qRawCount').textContent = `${r.raw_pages ?? 0} raw`;
+  $('qWikiCount').textContent = `${r.wiki_pages ?? 0} wiki`;
+  $('qApiKey').textContent = r.api_key_loaded ? 'loaded' : 'missing';
+  $('qApiKey').className = 'mono ' + (r.api_key_loaded ? 'text-emerald-400' : 'text-rose-400');
+  $('qModel').textContent = r.model || '—';
+  const wikiRadio = document.querySelector('input[name="queryMode"][value="raw+wiki"]');
+  const rawRadio = document.querySelector('input[name="queryMode"][value="raw"]');
+  if ((r.wiki_pages ?? 0) === 0) {
+    wikiRadio.disabled = true;
+    wikiRadio.parentElement.classList.add('opacity-40');
+    wikiRadio.parentElement.title = 'No reviewed wiki hubs in output/wiki/ yet';
+    if (wikiRadio.checked) { rawRadio.checked = true; }
+  } else {
+    wikiRadio.disabled = false;
+    wikiRadio.parentElement.classList.remove('opacity-40');
+    wikiRadio.parentElement.title = '';
+  }
+  loadSessionsList();
+}
+
+function currentQueryMode() {
+  const checked = document.querySelector('input[name="queryMode"]:checked');
+  return checked ? checked.value : 'raw';
+}
+
+$('qSubmit').addEventListener('click', submitQuery);
+$('qInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submitQuery(); }
+});
+$('qClear').addEventListener('click', () => clearConversation());
+$('qSave').addEventListener('click', () => saveCurrentSession());
+$('qSessionsRefresh').addEventListener('click', loadSessionsList);
+
+function clearConversation() {
+  qState.history = [];
+  qState.sessionCostUsd = 0;
+  qState.turns = 0;
+  qState.activeSessionId = null;
+  qState.activeSessionName = null;
+  $('qHistory').innerHTML = '';
+  $('qSessionCost').textContent = '$0.0000';
+  $('qSessionTurns').textContent = '0 turns';
+  $('qLastLatency').textContent = '';
+  updateActiveSessionLabel();
+  updateSaveButton();
+}
+
+function updateSaveButton() {
+  $('qSave').disabled = qState.history.length === 0;
+}
+
+function updateActiveSessionLabel() {
+  if (qState.activeSessionId) {
+    $('qActiveSession').textContent = `· loaded: ${qState.activeSessionName || qState.activeSessionId}`;
+  } else {
+    $('qActiveSession').textContent = qState.history.length ? '· unsaved' : '';
+  }
+}
+
+async function submitQuery() {
+  if (qState.submitting) return;
+  const q = $('qInput').value.trim();
+  if (!q) return;
+  const mode = currentQueryMode();
+  qState.submitting = true;
+  $('qSubmit').disabled = true;
+  $('qSubmit').textContent = 'thinking…';
+  $('qIdleHint').textContent = '';
+
+  const userTurn = { role: 'user', text: q, mode, timestamp: new Date().toISOString() };
+  qState.history.push(userTurn);
+  appendTurn(userTurn);
+  const placeholder = appendTurn({ role: 'assistant', text: '', mode, loading: true });
+
+  $('qInput').value = '';
+  updateActiveSessionLabel();
+
+  let r;
+  try {
+    r = await fetch('/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q, mode }),
+    }).then(async resp => {
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.detail || data.error || `HTTP ${resp.status}`);
+      return data;
+    });
+  } catch (err) {
+    placeholder.dataset.loading = '';
+    placeholder.querySelector('.assistant-body').innerHTML =
+      `<div class="text-rose-300 text-xs">Error: ${escapeHtml(String(err.message || err))}</div>`;
+    // Pop the user turn off history too — failed turn shouldn't bloat saved sessions.
+    qState.history.pop();
+    qState.submitting = false;
+    $('qSubmit').disabled = false;
+    $('qSubmit').textContent = 'Ask';
+    updateSaveButton();
+    return;
+  }
+
+  qState.sessionCostUsd += (r.cost_usd || 0);
+  qState.turns += 1;
+  $('qSessionCost').textContent = '$' + qState.sessionCostUsd.toFixed(4);
+  $('qSessionTurns').textContent = qState.turns + ' turns';
+  $('qLastLatency').textContent = `${r.latency_ms || 0} ms · $${(r.cost_usd || 0).toFixed(4)} this turn`;
+
+  const assistantTurn = {
+    role: 'assistant',
+    text: r.answer || '',
+    mode: r.mode,
+    citations: r.citations || [],
+    context_used: r.context_used || {},
+    cost_usd: r.cost_usd || 0,
+    latency_ms: r.latency_ms || 0,
+    raw_pages_loaded: r.raw_pages_loaded || 0,
+    wiki_pages_loaded: r.wiki_pages_loaded || 0,
+    timestamp: new Date().toISOString(),
+  };
+  qState.history.push(assistantTurn);
+
+  renderAssistantBody(placeholder, assistantTurn);
+  qState.submitting = false;
+  $('qSubmit').disabled = false;
+  $('qSubmit').textContent = 'Ask';
+  updateSaveButton();
+  updateActiveSessionLabel();
+}
+
+function appendTurn({ role, text, mode, loading }) {
+  const wrap = document.createElement('div');
+  wrap.className = 'flex gap-3';
+  const badge = role === 'user' ? 'bg-slate-700 text-slate-100' : 'bg-emerald-600/20 text-emerald-300';
+  const label = role === 'user' ? 'YOU' : 'CLAUDE';
+  wrap.innerHTML = `
+    <div class="shrink-0">
+      <span class="tag ${badge}">${label}</span>
+      <div class="text-[10px] text-slate-500 mt-1 mono">${escapeHtml(mode || '')}</div>
+    </div>
+    <div class="flex-1 min-w-0">
+      ${role === 'user'
+        ? `<div class="whitespace-pre-wrap text-slate-100">${escapeHtml(text)}</div>`
+        : `<div class="assistant-body prose prose-invert prose-sm max-w-none">${loading ? '<span class="text-slate-500 italic">…</span>' : ''}</div>`}
+    </div>`;
+  if (loading) wrap.dataset.loading = '1';
+  $('qHistory').appendChild(wrap);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return wrap;
+}
+
+function renderAssistantBody(turnEl, turn) {
+  turnEl.dataset.loading = '';
+  const body = turnEl.querySelector('.assistant-body');
+  const withChips = (turn.text || '').replace(
+    /\[\[(\d+)(?:\s*-\s*[^\]]+)?\]\]/g,
+    (_m, pid) => `<a href="#" class="cite-chip inline-block px-1 rounded bg-emerald-600/20 text-emerald-300 mono text-[11px] no-underline" data-pid="${pid}">[${pid}]</a>`
+  );
+  let html = marked.parse(withChips);
+  if (turn.citations && turn.citations.length) {
+    const items = turn.citations.map(c => {
+      const src = c.source_url
+        ? `<a href="${c.source_url}" target="_blank" class="text-slate-300 underline hover:text-emerald-300">${escapeHtml(c.title)}</a>`
+        : `<span class="text-slate-300">${escapeHtml(c.title)}</span>`;
+      return `<li><span class="mono text-emerald-400">[${c.page_id}]</span> — ${src}</li>`;
+    }).join('');
+    html += `<details open class="mt-3 text-xs"><summary class="cursor-pointer text-slate-400">Sources (${turn.citations.length})</summary><ul class="mt-1 space-y-0.5 pl-3 list-disc text-slate-400">${items}</ul></details>`;
+  }
+  html += `<div class="mt-2 text-[10px] text-slate-500 mono">mode=${turn.mode} · raw=${turn.raw_pages_loaded} · wiki=${turn.wiki_pages_loaded} · ${turn.latency_ms}ms · $${(turn.cost_usd||0).toFixed(4)}</div>`;
+  body.innerHTML = html;
+  body.querySelectorAll('.cite-chip').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      switchTab('output');
+      loadOutput().then(() => previewPage(a.dataset.pid));
+    });
+  });
+}
+
+// ---- saved sessions ----------------------------------------------------
+
+async function loadSessionsList() {
+  const r = await fetch('/api/query/sessions').then(r => r.json()).catch(() => ({sessions: []}));
+  const list = $('qSessionsList');
+  list.innerHTML = '';
+  const sessions = r.sessions || [];
+  $('qSessionsCount').textContent = sessions.length ? `(${sessions.length})` : '';
+  if (sessions.length === 0) {
+    list.innerHTML = `<div class="px-3 py-4 text-[11px] text-slate-500 italic">No saved chats yet.</div>`;
+    return;
+  }
+  for (const s of sessions) {
+    const row = document.createElement('div');
+    const isActive = qState.activeSessionId === s.session_id;
+    row.className = `border-b border-slate-800 px-3 py-2 cursor-pointer row-hover ${isActive ? 'bg-emerald-900/20' : ''}`;
+    row.innerHTML = `
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0 flex-1">
+          <div class="text-xs text-slate-100 truncate" title="${escapeHtml(s.name||'')}">${escapeHtml(s.name||'(untitled)')}</div>
+          <div class="text-[10px] text-slate-500 mono mt-0.5">${escapeHtml(s.created_at||'')}</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">${s.turn_count||0} turn${(s.turn_count||0)===1?'':'s'} · $${(s.total_cost_usd||0).toFixed(4)}</div>
+        </div>
+        <button class="qSessionDel text-slate-500 hover:text-rose-400 text-xs leading-none" title="Delete" data-id="${s.session_id}">×</button>
+      </div>`;
+    row.addEventListener('click', e => {
+      if (e.target.classList.contains('qSessionDel')) return;
+      loadSessionIntoConversation(s.session_id);
+    });
+    list.appendChild(row);
+  }
+  list.querySelectorAll('.qSessionDel').forEach(b => {
+    b.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (!confirm('Delete this saved chat?')) return;
+      const sid = b.dataset.id;
+      await fetch(`/api/query/sessions/${encodeURIComponent(sid)}`, { method: 'DELETE' });
+      if (qState.activeSessionId === sid) {
+        qState.activeSessionId = null;
+        qState.activeSessionName = null;
+        updateActiveSessionLabel();
+      }
+      loadSessionsList();
+    });
+  });
+}
+
+async function saveCurrentSession() {
+  if (qState.history.length === 0) return;
+  const defaultName = qState.history.find(t => t.role === 'user')?.text?.slice(0, 80) || '';
+  const name = prompt('Name this chat (leave blank for auto):', defaultName) ?? defaultName;
+  $('qSave').disabled = true;
+  $('qSave').textContent = 'saving…';
+  try {
+    const r = await fetch('/api/query/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ turns: qState.history, name }),
+    }).then(async resp => {
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.detail || `HTTP ${resp.status}`);
+      return data;
+    });
+    qState.activeSessionId = r.session_id;
+    qState.activeSessionName = r.name;
+    updateActiveSessionLabel();
+    loadSessionsList();
+    $('qSave').textContent = 'saved ✓';
+    setTimeout(() => { $('qSave').textContent = 'Save chat'; updateSaveButton(); }, 1500);
+  } catch (err) {
+    alert('Save failed: ' + (err.message || err));
+    $('qSave').textContent = 'Save chat';
+    updateSaveButton();
+  }
+}
+
+async function loadSessionIntoConversation(sessionId) {
+  let session;
+  try {
+    session = await fetch(`/api/query/sessions/${encodeURIComponent(sessionId)}`)
+      .then(async resp => {
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.detail || `HTTP ${resp.status}`);
+        return data;
+      });
+  } catch (err) {
+    alert('Load failed: ' + (err.message || err));
+    return;
+  }
+  clearConversation();
+  qState.activeSessionId = session.session_id;
+  qState.activeSessionName = session.name;
+  for (const turn of (session.turns || [])) {
+    qState.history.push(turn);
+    if (turn.role === 'user') {
+      appendTurn(turn);
+    } else {
+      const el = appendTurn({ role: 'assistant', mode: turn.mode, loading: false });
+      renderAssistantBody(el, turn);
+      qState.sessionCostUsd += (turn.cost_usd || 0);
+    }
+  }
+  qState.turns = session.turn_count || 0;
+  $('qSessionCost').textContent = '$' + qState.sessionCostUsd.toFixed(4);
+  $('qSessionTurns').textContent = qState.turns + ' turns';
+  $('qIdleHint').textContent = '';
+  updateActiveSessionLabel();
+  updateSaveButton();
+  loadSessionsList();  // repaint to highlight the active one
+}
+
+
+// ============ config ============
+async function loadConfig() {
+  const r = await fetch('/api/config').then(r => r.json()).catch(() => ({}));
+  $('configPath').textContent = r.path || '';
+  $('configYaml').textContent = r.raw_yaml || '';
+}
+
+// ============ utils ============
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+</script>
+
+</body>
+</html>

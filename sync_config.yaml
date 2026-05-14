@@ -1,0 +1,29 @@
+# v1 — single-space scope (Phase 1 of pipeline-spec.md v0.4)
+# Only ITSAI will actually be pulled in v1 (UI gates the rest).
+# Full inclusion config matures in v1.5+ as more spaces enter scope.
+
+space_categories:
+  ITSAI: knowledge-bases
+  CDIAPPS: knowledge-bases
+  ITHELP: its
+  itslemp: its
+default_space_category: uncategorized
+
+# Inclusion gates — three-knob logic:
+# final_include = (page_count >= min_pages_threshold OR key in include_keys)
+#                  AND key not in excluded_keys
+min_pages_threshold: 5
+include_keys: []
+excluded_keys:
+  - T002
+  - INFRASB
+  - ONEITSAND
+
+# v1 enables only ITSAI; other spaces are visually disabled in UI.
+enabled_keys:
+  - ITSAI
+
+output_dir: ./output
+api_base: https://su-jsm.atlassian.net/wiki/api/v2
+rate_limit_per_sec: 5
+inventory_path: ../../research/kb-ingestion-project/data/confluence-inventory-2026-05-13.json

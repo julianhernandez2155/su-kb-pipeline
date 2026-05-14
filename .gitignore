@@ -1,0 +1,26 @@
+# Secrets
+.env
+
+# Python build / dev
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# OneDrive / Windows temp
+.tmp/
+
+# Per-machine state (changes every run; would create noise)
+.sync-state.json
+
+# Chat session transcripts -- keep folder structure, ignore contents
+output/query-sessions/*
+!output/query-sessions/.gitkeep
+
+# Runtime junk at project root
+job.json
+response.json

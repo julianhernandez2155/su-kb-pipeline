@@ -1,0 +1,228 @@
+{
+  "main": {
+    "id": "0bb1100bedfd3e84",
+    "type": "split",
+    "children": [
+      {
+        "id": "027357383dad6da9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "820654f54bae2e9f",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a846df6a35d52b27",
+    "type": "split",
+    "children": [
+      {
+        "id": "593f6ef1fb3f17a2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "98d3e542da946099",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "94b3c0c705649ce4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "cff4e87bed300b66",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "fea825342ddaee04",
+    "type": "split",
+    "children": [
+      {
+        "id": "197e35a259f34c0b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e91d1f7bf39b7a24",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "549cab1fa346cb5c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "9ee03937559db7c5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "77830903f70239a9",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "7ad4011f2dd43d1f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "820654f54bae2e9f",
+  "lastOpenFiles": [
+    "wiki/index.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/index.md",
+    "index.md",
+    "CLAUDE.md",
+    "wiki/claude-at-syracuse-product-surface-map.md",
+    "wiki/approved-ai-tools-for-university-data.md",
+    "wiki",
+    "query-sessions/20260513T180233-109b43.json",
+    "query-sessions/20260513T180224-74f166.json",
+    "query-sessions/20260513T180216-618183.json",
+    "query-sessions/20260513T180205-e18189.json",
+    "query-sessions/20260513T180157-5d371d.json",
+    "query-sessions/20260513T180139-e85002.json",
+    "query-sessions/20260513T180128-08d7d3.json",
+    "query-sessions/20260513T180116-d0deb9.json",
+    "query-sessions/20260513T180103-ead044.json",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/Summer Intern 2026/1069350926 - Rob's Test Page.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/Summer Intern 2026/1069318154 - Shahaan Test Page 1.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/Summer Intern 2026/1068171339 - Julian Test 1st Page.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/988774401 - Working with SharePoint Files in Claude.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/988774401/Screenshot 2026-04-15 162826.jpg",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/988774401/image (1).png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/988774401/image.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/986841103 - Claude Code Setup.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/(Test) Resume Tailor Machine Brain/965672963 - The Workflow (how you actually use it).md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/948797482 - (Test) Resume Tailor Machine Brain.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/895451142 - Clementine Class Search.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/841875458 - Requesting a Claude Connector.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/837517313 - Claude Local MCP - Connecting Claude Desktop to Power BI.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-195737.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-192904.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-193155.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-195824.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-195700.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-194005.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/attachments/837517313/image-20260220-192341.png",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/836698117 - Claude Cowork — Overview and Security Considerations.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/700121089 - mentorAI - Tools.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/591101962 - mentorAI - Using the API.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/Example Uses/572194844 - AI Research Assistant with Claude.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/567279621 - mentorAI Settings & Options.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Gemini/544538648 - Google Gemini at Syracuse University.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/544505857 - mentorAI @ Syracuse University.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/544210961 - Connect Claude to M365.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Claude/540934169 - Purchase Claude Code and Claude API Access.md",
+    "raw/knowledge-bases/Artificial Intelligence (AI)/AI @ Syracuse University/AI/Clementine Platform/535068673 - mentorAI Creating A Mentor.md"
+  ]
+}
