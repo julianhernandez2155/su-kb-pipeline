@@ -206,7 +206,10 @@
           <input type="radio" name="queryMode" value="raw" class="accent-emerald-500"> raw only
         </label>
         <label class="flex items-center gap-1 cursor-pointer">
-          <input type="radio" name="queryMode" value="raw+wiki" class="accent-emerald-500" checked> raw + wiki
+          <input type="radio" name="queryMode" value="raw+wiki" class="accent-emerald-500"> raw + wiki
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="radio" name="queryMode" value="agentic" class="accent-emerald-500" checked> agentic (MCP-shape)
         </label>
       </div>
       <div class="flex items-center gap-2">
@@ -705,22 +708,110 @@ async function submitQuery() {
   $('qInput').value = '';
   updateActiveSessionLabel();
 
-  let r;
+  // Replace the spinner with our streaming scaffold (trace pane + text pane).
+  const body = placeholder.querySelector('.assistant-body');
+  body.innerHTML = `
+    <div class="agentic-trace mb-2 space-y-1 text-xs" data-empty="1"></div>
+    <div class="assistant-text whitespace-pre-wrap text-slate-100"></div>
+    <div class="assistant-footer mt-2"></div>
+  `;
+  const traceEl = body.querySelector('.agentic-trace');
+  const textEl = body.querySelector('.assistant-text');
+  const footerEl = body.querySelector('.assistant-footer');
+
+  let accumulated = '';
+  let toolByIter = {};   // iter -> array of row elements
+  let final = null;
+  let errored = null;
+
   try {
-    r = await fetch('/api/query', {
+    const resp = await fetch('/api/query/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question: q, mode }),
-    }).then(async resp => {
-      const data = await resp.json().catch(() => ({}));
-      if (!resp.ok) throw new Error(data.detail || data.error || `HTTP ${resp.status}`);
-      return data;
     });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.detail || data.error || `HTTP ${resp.status}`);
+    }
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    // SSE event-separator regex: handles both \n\n (LF) and \r\n\r\n (CRLF).
+    // sse_starlette emits CRLF, so we have to accept both. Confirmed via `od -c`.
+    const SEP_RE = /\r?\n\r?\n/;
+
+    // processSseChunk: parse one SSE event chunk and dispatch to the right
+    // handler. Defined BEFORE the loop so hoisting works in sloppy mode too.
+    // Returns 'done' / 'error' if the loop should exit, otherwise null.
+    const processSseChunk = (chunk) => {
+        let eventName = 'message';
+        let dataStr = '';
+        for (const line of chunk.split(/\r?\n/)) {
+          if (line.startsWith('event:')) eventName = line.slice(6).trim();
+          else if (line.startsWith('data:')) dataStr += line.slice(5).trim();
+        }
+        if (!dataStr) return null;
+        let payload;
+        try { payload = JSON.parse(dataStr); } catch (e) { return null; }
+        if (eventName === 'context_loaded') {
+          if (mode === 'agentic') {
+            const row = traceRow(`📚 corpus loaded: ${payload.raw_pages_loaded} raw, ${payload.wiki_pages_loaded} wiki, ${payload.orientation_files_loaded} orientation`, 'context');
+            traceEl.appendChild(row);
+            traceEl.dataset.empty = '';
+          }
+        } else if (eventName === 'tool_start') {
+          const label = formatToolLabel(payload.name, payload.input);
+          const row = traceRow(label, 'pending');
+          row.dataset.toolUseId = payload.tool_use_id || '';
+          row.dataset.toolName = payload.name;
+          if (!toolByIter[payload.iter]) toolByIter[payload.iter] = [];
+          toolByIter[payload.iter].push(row);
+          traceEl.appendChild(row);
+          traceEl.dataset.empty = '';
+        } else if (eventName === 'tool_result') {
+          const rows = toolByIter[payload.iter] || [];
+          const match = [...rows].reverse().find(r => r.dataset.toolName === payload.name && r.dataset.state === 'pending');
+          if (match) updateTraceRow(match, payload);
+        } else if (eventName === 'text_delta') {
+          accumulated += payload.text || '';
+          textEl.textContent = accumulated;
+          textEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else if (eventName === 'usage_update') {
+          $('qLastLatency').textContent = `iter ${payload.iteration} · $${(payload.cost_usd || 0).toFixed(4)} so far`;
+        } else if (eventName === 'done') {
+          final = payload;
+          return 'done';
+        } else if (eventName === 'error') {
+          errored = new Error(payload.message || 'stream error');
+          return 'error';
+        }
+        return null;
+    };
+
+    streamLoop: while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        // Drain any trailing event still in the buffer before exiting the loop.
+        if (buf.trim()) processSseChunk(buf);
+        break;
+      }
+      buf += decoder.decode(value, { stream: true });
+      let m;
+      while ((m = SEP_RE.exec(buf))) {
+        const chunk = buf.slice(0, m.index);
+        buf = buf.slice(m.index + m[0].length);
+        if (!chunk.trim()) continue;
+        const r = processSseChunk(chunk);
+        if (r === 'done' || r === 'error') break streamLoop;
+      }
+    }
+
+    if (errored) throw errored;
+    if (!final) throw new Error('stream closed without a `done` event');
   } catch (err) {
     placeholder.dataset.loading = '';
-    placeholder.querySelector('.assistant-body').innerHTML =
-      `<div class="text-rose-300 text-xs">Error: ${escapeHtml(String(err.message || err))}</div>`;
-    // Pop the user turn off history too — failed turn shouldn't bloat saved sessions.
+    body.innerHTML = `<div class="text-rose-300 text-xs">Error: ${escapeHtml(String(err.message || err))}</div>`;
     qState.history.pop();
     qState.submitting = false;
     $('qSubmit').disabled = false;
@@ -729,32 +820,106 @@ async function submitQuery() {
     return;
   }
 
-  qState.sessionCostUsd += (r.cost_usd || 0);
+  // Finalize: replace the streaming text with rendered markdown + citation chips,
+  // attach footer + sources, save into history for the session save flow.
+  placeholder.dataset.loading = '';
+  qState.sessionCostUsd += (final.cost_usd || 0);
   qState.turns += 1;
   $('qSessionCost').textContent = '$' + qState.sessionCostUsd.toFixed(4);
   $('qSessionTurns').textContent = qState.turns + ' turns';
-  $('qLastLatency').textContent = `${r.latency_ms || 0} ms · $${(r.cost_usd || 0).toFixed(4)} this turn`;
+  $('qLastLatency').textContent = `${final.latency_ms || 0} ms · $${(final.cost_usd || 0).toFixed(4)} this turn`;
 
   const assistantTurn = {
     role: 'assistant',
-    text: r.answer || '',
-    mode: r.mode,
-    citations: r.citations || [],
-    context_used: r.context_used || {},
-    cost_usd: r.cost_usd || 0,
-    latency_ms: r.latency_ms || 0,
-    raw_pages_loaded: r.raw_pages_loaded || 0,
-    wiki_pages_loaded: r.wiki_pages_loaded || 0,
+    text: final.answer || accumulated,
+    mode: final.mode || mode,
+    citations: final.citations || [],
+    context_used: final.context_used || {},
+    cost_usd: final.cost_usd || 0,
+    latency_ms: final.latency_ms || 0,
+    raw_pages_loaded: final.raw_pages_loaded || 0,
+    wiki_pages_loaded: final.wiki_pages_loaded || 0,
+    orientation_files_loaded: final.orientation_files_loaded || 0,
+    tool_calls: final.trace || [],
+    iterations: final.iterations || 0,
+    tool_call_count: final.tool_call_count || 0,
     timestamp: new Date().toISOString(),
   };
   qState.history.push(assistantTurn);
 
-  renderAssistantBody(placeholder, assistantTurn);
+  // Re-render the streaming text as full markdown (handles tables, lists, links).
+  const withChips = (assistantTurn.text || '').replace(
+    /\[\[(\d+)(?:\s*-\s*[^\]]+)?\]\]/g,
+    (_m, pid) => `<a href="#" class="cite-chip inline-block px-1 rounded bg-emerald-600/20 text-emerald-300 mono text-[11px] no-underline" data-pid="${pid}">[${pid}]</a>`
+  );
+  textEl.classList.remove('whitespace-pre-wrap');
+  textEl.classList.add('prose', 'prose-invert', 'prose-sm', 'max-w-none');
+  textEl.innerHTML = marked.parse(withChips);
+
+  // Footer: Sources + meta line.
+  let footerHtml = '';
+  if (assistantTurn.citations && assistantTurn.citations.length) {
+    const items = assistantTurn.citations.map(c => {
+      const src = c.source_url
+        ? `<a href="${c.source_url}" target="_blank" class="text-slate-300 underline hover:text-emerald-300">${escapeHtml(c.title)}</a>`
+        : `<span class="text-slate-300">${escapeHtml(c.title)}</span>`;
+      return `<li><span class="mono text-emerald-400">[${c.page_id}]</span> — ${src}</li>`;
+    }).join('');
+    footerHtml += `<details open class="mt-3 text-xs"><summary class="cursor-pointer text-slate-400">Sources (${assistantTurn.citations.length})</summary><ul class="mt-1 space-y-0.5 pl-3 list-disc text-slate-400">${items}</ul></details>`;
+  }
+  const meta = mode === 'agentic'
+    ? `mode=agentic · iters=${assistantTurn.iterations} · tools=${assistantTurn.tool_call_count} · ${assistantTurn.latency_ms}ms · $${(assistantTurn.cost_usd||0).toFixed(4)}`
+    : `mode=${assistantTurn.mode} · raw=${assistantTurn.raw_pages_loaded} · wiki=${assistantTurn.wiki_pages_loaded} · ${assistantTurn.latency_ms}ms · $${(assistantTurn.cost_usd||0).toFixed(4)}`;
+  footerHtml += `<div class="mt-2 text-[10px] text-slate-500 mono">${meta}</div>`;
+  footerEl.innerHTML = footerHtml;
+
+  textEl.querySelectorAll('.cite-chip').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      switchTab('output');
+      loadOutput().then(() => previewPage(a.dataset.pid));
+    });
+  });
+
   qState.submitting = false;
   $('qSubmit').disabled = false;
   $('qSubmit').textContent = 'Ask';
   updateSaveButton();
   updateActiveSessionLabel();
+}
+
+// ---- streaming-trace helpers --------------------------------------------
+
+function formatToolLabel(name, input) {
+  if (name === 'read_index') return `📑 read_index <span class="mono">${escapeHtml(input.path || '')}</span>`;
+  if (name === 'list_hubs') return `🗺️  list_hubs`;
+  if (name === 'search') return `🔍 search <span class="mono">"${escapeHtml(input.query || '')}"</span>`;
+  if (name === 'read_page') return `📖 read_page <span class="mono">${escapeHtml(input.id || '')}</span>`;
+  return `<span class="mono">${escapeHtml(name)}</span>(${escapeHtml(JSON.stringify(input || {}))})`;
+}
+
+function traceRow(labelHtml, state) {
+  const el = document.createElement('div');
+  el.className = 'flex items-start gap-2 rounded border border-slate-800 bg-slate-950/40 px-2 py-1';
+  el.dataset.state = state;
+  const dot = state === 'pending'
+    ? '<span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse mt-1.5 shrink-0"></span>'
+    : state === 'context'
+      ? '<span class="inline-block w-2 h-2 rounded-full bg-slate-500 mt-1.5 shrink-0"></span>'
+      : '<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0"></span>';
+  el.innerHTML = `${dot}<div class="flex-1 min-w-0 text-slate-300">${labelHtml}<div class="trace-detail text-[10px] text-slate-500 mt-0.5"></div></div>`;
+  return el;
+}
+
+function updateTraceRow(row, payload) {
+  row.dataset.state = payload.is_miss ? 'miss' : 'done';
+  const dot = row.firstChild;
+  if (dot && dot.classList) {
+    dot.classList.remove('bg-amber-400', 'animate-pulse');
+    dot.classList.add(payload.is_miss ? 'bg-rose-500' : 'bg-emerald-500');
+  }
+  const detail = row.querySelector('.trace-detail');
+  if (detail) detail.textContent = payload.summary || '';
 }
 
 function appendTurn({ role, text, mode, loading }) {

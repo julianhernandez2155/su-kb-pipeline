@@ -59,6 +59,13 @@ def main() -> int:
     ap.add_argument("--server", default="http://127.0.0.1:8765")
     ap.add_argument("--out", default=str(PROJECT_ROOT / "eval-runs"))
     ap.add_argument("--prefix", default="eval-baseline", help="session name prefix")
+    ap.add_argument(
+        "--sleep",
+        type=float,
+        default=20.0,
+        help="seconds to wait between queries; keeps the per-minute input-token "
+             "rate limit safe when the corpus is large (default: 20s)",
+    )
     args = ap.parse_args()
 
     if not EVAL_YAML.exists():
@@ -82,11 +89,16 @@ def main() -> int:
         expected = [str(p) for p in q.get("expected_pages", [])]
         sys.stdout.write(f"[{i}/{len(queries)}] {qid}: {question[:60]}...")
         sys.stdout.flush()
+        if i > 1 and args.sleep > 0:
+            time.sleep(args.sleep)
         t0 = time.perf_counter()
         try:
             r = _post(f"{args.server}/api/query", {"question": question, "mode": args.mode})
         except Exception as e:
-            print(f"  FAILED: {e}")
+            # Strip non-cp1252 characters (the SDK uses unicode arrows) so the
+            # Windows console can render the error without UnicodeEncodeError.
+            safe = str(e).encode("ascii", errors="replace").decode("ascii")
+            print(f"  FAILED: {safe}")
             continue
         elapsed = time.perf_counter() - t0
         total_cost += r.get("cost_usd", 0)

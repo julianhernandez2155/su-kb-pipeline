@@ -1,0 +1,143 @@
+{
+  "run_stamp": "20260518T111435",
+  "mode": "agentic",
+  "model": "claude-sonnet-4-6",
+  "total_queries": 2,
+  "completed": 2,
+  "total_cost_usd": 0.062318,
+  "avg_tool_calls_per_query": 2.0,
+  "corpus": {
+    "raw_pages": 29,
+    "wiki_hubs": 2,
+    "orientation_files": 4
+  },
+  "results": [
+    {
+      "id": "q06",
+      "type": "where-do-i",
+      "question": "How do I install Claude Code on Windows?",
+      "expected_pages": [
+        "986841103",
+        "540934169"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a step-by-step guide for installing Claude Code on Windows [[986841103]]:\n\n---\n\n## Step 1: Get Access to Claude Code\n\nFirst, you need to obtain access to Claude Code. See the [Purchase Claude Code and Claude API Access](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/540934169/Purchase+Claude+Code+and+Claude+API+Access) page for your options [[986841103]].\n\n---\n\n## Step 2: Install Claude Code & Development Tools\n\nAn automated PowerShell script (`Install-DevTools.ps1`) handles the entire installation. It auto-detects your system architecture (AMD64 or ARM64) and installs the following tools [[986841103]]:\n\n| Tool | Version | Notes |\n|---|---|---|\n| Node.js | 24.12.0 | Portable/embedded |\n| Git Portable | 2.52.0 | Includes Git Bash |\n| Python Embeddable | 3.14.3 | Skipped if system Python detected |\n| VS Code Portable | Latest | Skipped if already installed |\n| GitHub Desktop | Latest | Visual interface for Git |\n| PowerShell 7 | Latest | Via winget; skipped if already installed |\n| Claude Code | Latest | Always installs locally |\n\n> **Note:** Tools install to your **OneDrive** by default (for sync across devices). Claude Code always installs locally at `%USERPROFILE%\\.local\\bin`.\n\n### 2a. Set the PowerShell Execution Policy\nOpen PowerShell and run:\n```powershell\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n\n### 2b. Download the Script\nDownload [`Install-DevTools.ps1`](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) and save it (e.g., to your Downloads folder).\n\n### 2c. Remove the \"Mark of the Web\"\nWindows blocks scripts downloaded from the internet. Unblock the file using **one** of these methods:\n\n- **PowerShell (recommended):**\n  ```powershell\n  Unblock-File -Path \"$HOME\\Downloads\\Install-DevTools.ps1\"\n  ```\n- **File Explorer:** Right-click the file → Properties → check **Unblock** → click OK.\n\n### 2d. Run the Script\n```powershell\n# Install all tools to OneDrive (default)\n.\\Install-DevTools.ps1\n```\n\n---\n\n## Step 3: Configure Claude Code\n\nOnce installed, connect Claude Code to your SU account [[986841103]]:\n\n1. Open a terminal and type `claude`\n2. Choose your preferred text display style.\n3. Select **\"Anthropic Console account\"** (option 2) for your login method.\n4. A browser window will open — sign in with your **`netid@syr.edu`** credentials. If prompted, select the **Syracuse University** organization.\n5. **Authorize Claude Code** in the browser.\n6. Return to the terminal and press **Enter twice** to accept and trust the folder.\n\n✅ **You're all set!** Claude Code is ready to use.\n\n---\n\n## Troubleshooting Tips\n\n- **Script won't run?** You may need to bypass the execution policy for a single session:\n  ```powershell\n  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process\n  ```\n  Or from Command Prompt: `powershell -ExecutionPolicy Bypass -File .\\Install-DevTools.ps1`\n- **32-bit systems** are not supported — only AMD64 and ARM64.\n- **No OneDrive?** Use the `-Location Local` flag when running the script.\n- **Network issues?** Some networks may block downloads — check your internet connectivity.\n\n---\n\n## Sources\n- [Claude Code Setup](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) [[986841103]]",
+      "cited_raw": [
+        "986841103"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "986841103",
+          "title": "Claude Code Setup",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup"
+        }
+      ],
+      "hit_expected": [
+        "986841103"
+      ],
+      "missed_expected": [
+        "540934169"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude Code install Windows"
+          },
+          "summary": "query='Claude Code install Windows' → 5 hits: claude-at-syracuse-product-surface-map(wiki,113.85), 986841103(raw,79.0), 488210484(raw,75.0), 540934169(raw,46.5), 522158118(raw,42.0)",
+          "output_chars": 5088
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "986841103"
+          },
+          "summary": "raw 986841103 'Claude Code Setup' (6666 chars)",
+          "output_chars": 6903
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 5635,
+        "output_tokens": 1076,
+        "cache_creation_input_tokens": 772,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.037603,
+      "latency_ms": 18931,
+      "session_id": "20260518T151454-d9e6cb"
+    },
+    {
+      "id": "q10",
+      "type": "how-to",
+      "question": "How do I create a new mentor on the Clementine platform?",
+      "expected_pages": [
+        "535068673",
+        "567279621"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a step-by-step guide to creating a new mentor on the Clementine (mentorAI) platform [[535068673]]:\n\n---\n\n## Creating a New Mentor on Clementine (mentorAI)\n\n### Step 1: Start a New Mentor\n- From your **dashboard**, click the **\"New Mentor\"** button.\n\n---\n\n### Step 2: Input Mentor Information\nFill in the following fields:\n\n1. **Name** — Enter the mentor's name. This will be the primary identifier for mentees looking to connect.\n2. **Description** — Write a brief bio covering the mentor's background, skills, and what type of mentorship they offer (e.g., career advice, skill development).\n3. **Category** — Select the appropriate category based on the mentor's expertise (e.g., Astronomy, Art, Anthropology). This helps mentees find relevant mentors.\n4. **Mentor Visibility** — Choose whether the mentor will be visible to all students, select groups, or kept private.\n5. **Image** — Optionally upload a professional profile picture to enhance engagement and make the profile more relatable.\n\n---\n\n### Step 3: Configure Prompts\nSet up the interaction prompts for the mentor:\n\n1. **System Prompts** — Review and optionally modify the pre-populated prompts that define how the mentor should interact with mentees.\n2. **Proactive Prompts** — Add engagement prompts to initiate discussions with mentees. Tailor these to encourage specific types of interactions.\n3. **Guided Prompts** — Set structured guidance for conversations, relevant to the mentor's expertise and the mentee's needs.\n\n> 💡 **Tip:** Add your configured prompts at the bottom of the default prompts for more effective mentoring.\n\n---\n\n### Step 4: Save\n- Click the **\"Save\"** button to submit and publish the new mentor profile.\n\n---\n\nFor additional configuration options (e.g., fine-tuning settings and behavior), you can also refer to the **mentorAI Settings & Options** page on Confluence.\n\n---\n\n**Sources:**\n- [mentorAI Creating A Mentor](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor) [[535068673]]",
+      "cited_raw": [
+        "535068673"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "535068673",
+          "title": "mentorAI Creating A Mentor",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor"
+        }
+      ],
+      "hit_expected": [
+        "535068673"
+      ],
+      "missed_expected": [
+        "567279621"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Clementine mentor create new",
+            "top_k": 5
+          },
+          "summary": "query='Clementine mentor create new' → 5 hits: 591101962(raw,31.5), 895451142(raw,25.62), 567279621(raw,25.38), 535068673(raw,15.75), 515801118(raw,8.25)",
+          "output_chars": 2974
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "535068673"
+          },
+          "summary": "raw 535068673 'mentorAI Creating A Mentor' (2876 chars)",
+          "output_chars": 3153
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 3279,
+        "output_tokens": 674,
+        "cache_creation_input_tokens": 828,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.024715,
+      "latency_ms": 11154,
+      "session_id": "20260518T151510-417632"
+    }
+  ]
+}

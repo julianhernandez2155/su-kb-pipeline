@@ -1,0 +1,532 @@
+{
+  "run_stamp": "20260518T111602",
+  "mode": "agentic",
+  "model": "claude-sonnet-4-6",
+  "total_queries": 15,
+  "completed": 6,
+  "total_cost_usd": 0.230659,
+  "avg_tool_calls_per_query": 2.0,
+  "corpus": {
+    "raw_pages": 29,
+    "wiki_hubs": 2,
+    "orientation_files": 4
+  },
+  "results": [
+    {
+      "id": "q01",
+      "type": "factual",
+      "question": "Can I upload FERPA-protected student data to Claude at Syracuse?",
+      "expected_pages": [
+        "488210484",
+        "488144948"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "**Yes — but only when you're logged in with your SU NetID.** Here's what you need to know:\n\n---\n\n## FERPA-Protected Data & Claude at Syracuse\n\n### ✅ It Is Permitted (With Conditions)\n\nWhen you access **Claude Enterprise** at [getclaude.syr.edu](https://getclaude.syr.edu) using your SU NetID credentials, **all Data Classification Definitions of university data** — which includes FERPA-protected student records — may be used [[approved-ai-tools-for-university-data]]. The same rule applies to Microsoft Copilot (when logged in with SU credentials) [[approved-ai-tools-for-university-data]].\n\n### 🔒 Key Data Protections in Place\n\n| Protection | What It Means |\n|---|---|\n| **No model training** | Your uploaded data and chats are **not used to train Claude** by default. Only explicitly submitted feedback may be used [[approved-ai-tools-for-university-data]]. |\n| **Data ownership** | You retain ownership of your inputs; you are granted ownership of Claude's outputs [[approved-ai-tools-for-university-data]]. |\n| **Vendor data handling** | Anthropic has contractual enterprise-grade data protections with SU. |\n| **SU IT access** | Authorized SU IT staff may access data for support/security purposes, governed by SU's IT Resources Acceptable Use policy and Information Security Framework [[approved-ai-tools-for-university-data]]. |\n\n### ⚠️ Important Caveats\n\n- **Retention:** All chat data is retained for **2 years**, even items you delete (they remain on the platform, just not visible to you) [[approved-ai-tools-for-university-data]].\n- **Shared artifacts:** Be careful when sharing Claude Projects or Artifacts — data included in those shared items may be exposed to others [[approved-ai-tools-for-university-data]].\n- **Incognito/private chats:** Even in incognito mode, data is still retained on the platform per the standard 2-year retention policy — it's just not saved to your chat history [[approved-ai-tools-for-university-data]].\n- **Personal accounts:** Do NOT use a personal Claude.ai account (outside getclaude.syr.edu) with FERPA data — the protections above only apply when logged in with your SU NetID.\n\n---\n\n**Bottom line:** Claude Enterprise via getclaude.syr.edu is an approved tool for FERPA-protected student data at Syracuse, provided you use your SU NetID login and exercise care around sharing and retention.\n\n---\n\n### Sources:\n- [Approved Tools for Use with University Data](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data) [[488144948]]\n- [Claude – Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions) [[488210484]]\n- [Copilot – Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions) [[522289260]]\n- [Claude Enterprise at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University) [[534642749]]\n- [AI @ Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University) [[483525103]]\n*(synthesized via the* [[approved-ai-tools-for-university-data]] *wiki hub)*",
+      "cited_raw": [
+        "488144948",
+        "488210484",
+        "522289260",
+        "534642749",
+        "483525103"
+      ],
+      "cited_wiki": [
+        "approved-ai-tools-for-university-data"
+      ],
+      "citations": [
+        {
+          "page_id": "488144948",
+          "title": "Approved Tools for Use with University Data",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data"
+        },
+        {
+          "page_id": "488210484",
+          "title": "Claude - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "522289260",
+          "title": "Copilot – Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "534642749",
+          "title": "Claude Enterprise at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University"
+        },
+        {
+          "page_id": "483525103",
+          "title": "AI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University"
+        },
+        {
+          "page_id": "498597967",
+          "title": "Google Gemini - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "544538648",
+          "title": "Google Gemini at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University"
+        },
+        {
+          "page_id": "544505857",
+          "title": "mentorAI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University"
+        }
+      ],
+      "hit_expected": [
+        "488210484",
+        "488144948"
+      ],
+      "missed_expected": [],
+      "extra_pages": [
+        "522289260",
+        "534642749",
+        "483525103"
+      ],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "list_hubs",
+          "input": {},
+          "summary": "2 hubs: approved-ai-tools-for-university-data, claude-at-syracuse-product-surface-map",
+          "output_chars": 5917
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "approved-ai-tools-for-university-data"
+          },
+          "summary": "wiki approved-ai-tools-for-university-data (8723 chars)",
+          "output_chars": 10654
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 7090,
+        "output_tokens": 1023,
+        "cache_creation_input_tokens": 750,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.041091,
+      "latency_ms": 20365,
+      "session_id": "20260518T151623-642e0b"
+    },
+    {
+      "id": "q02",
+      "type": "factual",
+      "question": "How long does Anthropic retain my Claude chats?",
+      "expected_pages": [
+        "488210484"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Anthropic retains all Claude data — including chat history, projects, artifacts, and uploaded items — for **2 years** [[488210484]].\n\nA couple of important nuances to keep in mind:\n\n- **Deleted chats are still retained.** When you delete a chat or project, it becomes invisible to you and is removed from your personalized memories, but Anthropic still retains it on the platform for the full 2-year retention period [[488210484]].\n- **Incognito chats are not exempt.** Even though incognito chats aren't saved to your chat history or Claude memory, the session is still retained on the Claude platform and follows the same 2-year retention policy [[488210484]].\n\n---\n\n**Sources:**\n- [Claude – Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions) [[488210484]]",
+      "cited_raw": [
+        "488210484"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "488210484",
+          "title": "Claude - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions"
+        }
+      ],
+      "hit_expected": [
+        "488210484"
+      ],
+      "missed_expected": [],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude chat retention Anthropic"
+          },
+          "summary": "query='Claude chat retention Anthropic' → 5 hits: 488210484(raw,112.0), claude-at-syracuse-product-surface-map(wiki,92.57), 522158118(raw,47.25), 836698117(raw,42.0), approved-ai-tools-for-university-data(wiki,41.4)",
+          "output_chars": 7043
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "488210484"
+          },
+          "summary": "raw 488210484 'Claude - Frequently Asked Questions' (12521 chars)",
+          "output_chars": 12812
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 8093,
+        "output_tokens": 336,
+        "cache_creation_input_tokens": 782,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.033915,
+      "latency_ms": 8826,
+      "session_id": "20260518T151636-192bb4"
+    },
+    {
+      "id": "q03",
+      "type": "synthesis",
+      "question": "What AI tools at SU are approved for use with university data?",
+      "expected_pages": [
+        "488144948",
+        "488210484",
+        "522289260",
+        "498597967"
+      ],
+      "expected_to_benefit_from_wiki": true,
+      "answer": "Here is a comprehensive overview of the AI tools approved at Syracuse University for use with university data:\n\n---\n\n## ✅ Approved AI Tools for University Data at SU\n\nWhen logged in with your **SU NetID credentials**, the following tools are approved [[488144948]]:\n\n| Tool | Access |\n|---|---|\n| **Anthropic Claude Enterprise** | [getclaude.syr.edu](https://getclaude.syr.edu) |\n| **mentorAI (Clementine Platform)** | [mentor.ai.syr.edu](https://mentor.ai.syr.edu) |\n| **Microsoft Copilot** (Work or Web) | [m365.cloud.microsoft/chat](https://m365.cloud.microsoft/chat) |\n| **Google Gemini** | [gemini.google.com/app](https://gemini.google.com/app) *(login as NetID@g.syr.edu)* |\n| **Blackboard AI** | Via Blackboard |\n| **OpenAI ChatGPT Teams** | Request access via IT Support |\n| **Adobe Firefly** | Via Adobe |\n| **Gradescope** | Via Gradescope |\n\n---\n\n## 🔐 Key Data Policy Highlights\n\n### All Data Classifications Permitted (with NetID login)\n- **Claude Enterprise** and **Microsoft Copilot** both explicitly permit use with **all SU Data Classification levels** when signed in with university credentials [[488210484]] [[522289260]].\n- **Google Gemini** requires sign-in with your SU Google account (`NetID@g.syr.edu`), not a personal Gmail [[498597967]].\n\n### Your Data is NOT Used for Training\n- **Claude Enterprise**: Chats and uploaded data are **not** used to train AI models by default [[488210484]].\n- **Microsoft Copilot**: Microsoft does **not** use SU account interactions to train its AI models [[522289260]].\n- **Google Gemini**: Prompts and chats in Gemini for Education are **not** used to train Google's generative AI models [[498597967]].\n\n### Data Ownership\nAll three major tools (Claude, Copilot, Gemini) affirm that you **retain ownership** of your inputs, and that you are granted ownership of the outputs the AI creates [[488210484]] [[522289260]] [[498597967]].\n\n### Data Retention\n- **Claude Enterprise**: All data retained for **2 years** (deleted items remain on the platform) [[488210484]].\n- **Microsoft Copilot**: Conversations stored in your M365 mailbox; recoverable by admins for up to **30 days** after deletion [[522289260]].\n- **Google Gemini / mentorAI**: Retention periods not specified in available documentation.\n\n---\n\n## 🛠️ Which Tool for Which Job?\n\n- **Microsoft Copilot** — Best for users deeply embedded in Microsoft 365 (Word, Excel, Teams, Outlook, PowerPoint) [[483525103]].\n- **Google Gemini** — Includes guided learning, image generation, and a canvas editor; uses Google's 2.5 Pro model [[483525103]].\n- **Claude Enterprise** — General-purpose intelligent assistant; no technical knowledge required [[534642749]].\n- **mentorAI** — SU's own private AI platform focused on **teaching, learning, and AI innovation**, available to all students, faculty, and staff [[544505857]].\n\n---\n\n## ⚠️ Important Reminder\nEven with approved tools, be thoughtful about what data you share — for example, be cautious about data uploaded to shared Claude Projects or Artifacts, as those may be visible to others [[488210484]].\n\n---\n\n## Sources\n\n- [Approved Tools for Use with University Data](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data) [[488144948]]\n- [Claude - Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions) [[488210484]]\n- [Copilot – Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions) [[522289260]]\n- [Google Gemini - Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions) [[498597967]]\n- [AI @ Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University) [[483525103]]\n- [Google Gemini at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University) [[544538648]]\n- [Claude Enterprise at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University) [[534642749]]\n- [mentorAI @ Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University) [[544505857]]",
+      "cited_raw": [
+        "488144948",
+        "488210484",
+        "522289260",
+        "498597967",
+        "483525103",
+        "534642749",
+        "544505857",
+        "544538648"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "488144948",
+          "title": "Approved Tools for Use with University Data",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data"
+        },
+        {
+          "page_id": "488210484",
+          "title": "Claude - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "522289260",
+          "title": "Copilot – Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "498597967",
+          "title": "Google Gemini - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "483525103",
+          "title": "AI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University"
+        },
+        {
+          "page_id": "534642749",
+          "title": "Claude Enterprise at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University"
+        },
+        {
+          "page_id": "544505857",
+          "title": "mentorAI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University"
+        },
+        {
+          "page_id": "544538648",
+          "title": "Google Gemini at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University"
+        }
+      ],
+      "hit_expected": [
+        "488144948",
+        "488210484",
+        "522289260",
+        "498597967"
+      ],
+      "missed_expected": [],
+      "extra_pages": [
+        "483525103",
+        "534642749",
+        "544505857",
+        "544538648"
+      ],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "list_hubs",
+          "input": {},
+          "summary": "2 hubs: approved-ai-tools-for-university-data, claude-at-syracuse-product-surface-map",
+          "output_chars": 5917
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "approved-ai-tools-for-university-data"
+          },
+          "summary": "wiki approved-ai-tools-for-university-data (8723 chars)",
+          "output_chars": 10654
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 7089,
+        "output_tokens": 1431,
+        "cache_creation_input_tokens": 748,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.0472,
+      "latency_ms": 23582,
+      "session_id": "20260518T151705-0677e5"
+    },
+    {
+      "id": "q04",
+      "type": "synthesis",
+      "question": "How should I decide between Claude, Copilot, and Gemini for academic work?",
+      "expected_pages": [
+        "488210484",
+        "522289260",
+        "498597967",
+        "544538648"
+      ],
+      "expected_to_benefit_from_wiki": true,
+      "answer": "Here's a comprehensive guide to help you choose the right AI tool for your academic work at Syracuse University:\n\n---\n\n## Choosing Between Claude, Copilot, and Gemini for Academic Work at SU\n\nAll three tools are approved for use with university data when you sign in with your SU credentials (NetID), and all three share the same foundational policy commitments — so the best choice comes down to **your workflow and where you spend your time** [[approved-ai-tools-for-university-data]].\n\n---\n\n### 🔑 Key Policy Facts (All Three Tools)\n\n| Policy Area | Claude Enterprise | Microsoft Copilot | Google Gemini |\n|---|---|---|---|\n| **Approved for university data?** | ✅ Yes (with NetID) | ✅ Yes (with NetID) | ✅ Yes (NetID@g.syr.edu) |\n| **Trains on your data?** | ❌ No | ❌ No | ❌ No |\n| **You own your outputs?** | ✅ Yes | ✅ Yes | ✅ Yes |\n| **Data retention** | 2 years | 30 days recoverable in M365 | Not specified |\n\n---\n\n### 🛠️ When to Choose Each Tool\n\n#### **Microsoft Copilot** — Best if you live in Microsoft 365\n- Copilot is **built directly into Word, Excel, PowerPoint, Teams, Outlook, and OneNote**, making it ideal for drafting papers, summarizing readings, building presentations, or managing academic communications [[approved-ai-tools-for-university-data]].\n- It uses **OpenAI's GPT-5 model** [[approved-ai-tools-for-university-data]].\n- Access it at: `m365.cloud.microsoft/chat`\n\n#### **Google Gemini** — Best if you use Google Workspace\n- Gemini is tightly connected to the **Google ecosystem** and your `NetID@g.syr.edu` Google account.\n- It includes **guided learning tools, image generation, and a canvas editor** — features particularly useful for creative or visually-oriented academic projects [[approved-ai-tools-for-university-data]].\n- Uses Google's **Gemini 2.5 Pro model** [[approved-ai-tools-for-university-data]].\n- Gemini does **not** have unrestricted access to your Google Drive — only files you explicitly share in a session [[approved-ai-tools-for-university-data]].\n- Access it at: `gemini.google.com/app` (sign in as `NetID@g.syr.edu`)\n\n#### **Claude Enterprise** — Best for deep, long-form academic tasks\n- Claude is positioned as a general-purpose **\"intelligent digital colleague\"** requiring no technical knowledge to use [[approved-ai-tools-for-university-data]].\n- It excels at **writing assistance, research, problem-solving, data analysis, and creative collaboration** [[approved-ai-tools-for-university-data]].\n- Supports **Projects** for organizing ongoing work, and **memory** features configurable in settings [[approved-ai-tools-for-university-data]].\n- One caveat: Claude retains all chat data for **2 years**, even after you delete it from view [[approved-ai-tools-for-university-data]].\n- Access it at: `getclaude.syr.edu`\n\n---\n\n### 📋 Bottom-Line Recommendations\n\n| Your Situation | Best Tool |\n|---|---|\n| Drafting papers, emails, or slides in Microsoft apps | **Copilot** |\n| Working in Google Docs or Google Drive | **Gemini** |\n| Deep research, long-form writing, complex analysis | **Claude** |\n| Personalized learning or teaching support | **mentorAI** (also available at SU!) |\n| No strong platform preference | **Any of the three** — policies are equally protective |\n\n---\n\n### ⚠️ A Note on Academic Integrity\nWhichever tool you choose, be sure to follow Syracuse University's academic integrity policies and any course-specific instructor guidelines on AI use. The tools themselves don't resolve those questions.\n\n---\n\n### Sources\n\n- [Approved Tools for Use with University Data](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data) [[488144948]]\n- [Claude - Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions) [[488210484]]\n- [Copilot – Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+%E2%80%93+Frequently+Asked+Questions) [[522289260]]\n- [Google Gemini - Frequently Asked Questions](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions) [[498597967]]\n- [AI @ Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University) [[483525103]]\n- [Google Gemini at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University) [[544538648]]\n- [Claude Enterprise at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University) [[534642749]]\n- [mentorAI @ Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University) [[544505857]]",
+      "cited_raw": [
+        "488144948",
+        "488210484",
+        "522289260",
+        "498597967",
+        "483525103",
+        "544538648",
+        "534642749",
+        "544505857"
+      ],
+      "cited_wiki": [
+        "approved-ai-tools-for-university-data"
+      ],
+      "citations": [
+        {
+          "page_id": "488144948",
+          "title": "Approved Tools for Use with University Data",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488144948/Approved+Tools+for+Use+with+University+Data"
+        },
+        {
+          "page_id": "488210484",
+          "title": "Claude - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "522289260",
+          "title": "Copilot – Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "498597967",
+          "title": "Google Gemini - Frequently Asked Questions",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions"
+        },
+        {
+          "page_id": "483525103",
+          "title": "AI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University"
+        },
+        {
+          "page_id": "544538648",
+          "title": "Google Gemini at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University"
+        },
+        {
+          "page_id": "534642749",
+          "title": "Claude Enterprise at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University"
+        },
+        {
+          "page_id": "544505857",
+          "title": "mentorAI @ Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University"
+        }
+      ],
+      "hit_expected": [
+        "488210484",
+        "522289260",
+        "498597967",
+        "544538648"
+      ],
+      "missed_expected": [],
+      "extra_pages": [
+        "488144948",
+        "483525103",
+        "534642749",
+        "544505857"
+      ],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "list_hubs",
+          "input": {},
+          "summary": "2 hubs: approved-ai-tools-for-university-data, claude-at-syracuse-product-surface-map",
+          "output_chars": 5917
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "approved-ai-tools-for-university-data"
+          },
+          "summary": "wiki approved-ai-tools-for-university-data (8723 chars)",
+          "output_chars": 10654
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 7128,
+        "output_tokens": 1573,
+        "cache_creation_input_tokens": 760,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.049492,
+      "latency_ms": 27102,
+      "session_id": "20260518T151737-b8c3f4"
+    },
+    {
+      "id": "q05",
+      "type": "where-do-i",
+      "question": "Where do I sign up for Claude at Syracuse?",
+      "expected_pages": [
+        "534642749",
+        "483525103"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "You can sign up for **Claude Enterprise** at Syracuse University using the following link:\n\n👉 **[getclaude.syr.edu](https://getclaude.syr.edu/)**\n\nClaude Enterprise is Syracuse University's premium AI assistant, available to the SU community. Just visit that link to get started — no coding or technical knowledge required [[534642749]]!\n\n---\n\n**Sources:**\n- [Claude Enterprise at Syracuse University](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University) [[534642749]]",
+      "cited_raw": [
+        "534642749"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "534642749",
+          "title": "Claude Enterprise at Syracuse University",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University"
+        }
+      ],
+      "hit_expected": [
+        "534642749"
+      ],
+      "missed_expected": [
+        "483525103"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude sign up Syracuse",
+            "top_k": 3
+          },
+          "summary": "query='Claude sign up Syracuse' → 3 hits: claude-at-syracuse-product-surface-map(wiki,82.42), 488210484(raw,76.67), 540934169(raw,50.0)",
+          "output_chars": 3964
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "534642749"
+          },
+          "summary": "raw 534642749 'Claude Enterprise at Syracuse University' (2961 chars)",
+          "output_chars": 3267
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 3811,
+        "output_tokens": 272,
+        "cache_creation_input_tokens": 812,
+        "cache_read_input_tokens": 5544
+      },
+      "cost_usd": 0.020221,
+      "latency_ms": 6544,
+      "session_id": "20260518T151749-0a3948"
+    },
+    {
+      "id": "q06",
+      "type": "where-do-i",
+      "question": "How do I install Claude Code on Windows?",
+      "expected_pages": [
+        "986841103",
+        "540934169"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a complete guide to installing Claude Code on Windows, based on Syracuse University's official setup page:\n\n---\n\n## Installing Claude Code on Windows\n\n### Step 1: Get Access to Claude Code\nFirst, you'll need to obtain access to Claude Code. See the [Purchase Claude Code and Claude API Access](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/540934169/Purchase+Claude+Code+and+Claude+API+Access) page for methods to do so [[986841103]].\n\n---\n\n### Step 2: Install Claude Code & Development Tools\n\nSyracuse provides an automated PowerShell script (`Install-DevTools.ps1`) that downloads and configures all required tools. It auto-detects your system architecture (AMD64 or ARM64) and is safe to run multiple times [[986841103]].\n\n**What gets installed:**\n\n| Tool | Version | Notes |\n|---|---|---|\n| Node.js | 24.12.0 | Portable/embedded |\n| Git Portable | 2.52.0 | Includes Git Bash |\n| Python Embeddable | 3.14.3 | Skipped if system Python detected |\n| VS Code Portable | Latest | Skipped if already installed |\n| GitHub Desktop | Latest | Visual Git interface |\n| PowerShell 7 | Latest | Via winget; skipped if already installed |\n| Claude Code | Latest | Always installs locally |\n\n> **Note:** Tools install to your **OneDrive** by default for sync across devices. Claude Code always installs locally to `%USERPROFILE%\\.local\\bin` [[986841103]].\n\n---\n\n**2a. Set the Execution Policy**\n\nOpen PowerShell and run:\n```powershell\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n\n**2b. Download the Install Script**\n\nDownload [`Install-DevTools.ps1`](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) from the Claude Code Setup page and save it to your Downloads folder.\n\n**2c. Remove the \"Mark of the Web\"**\n\nWindows blocks scripts downloaded from the internet. Unblock it first:\n\n- **Option 1 (Recommended) — PowerShell:**\n  ```powershell\n  Unblock-File -Path \"$HOME\\Downloads\\Install-DevTools.ps1\"\n  ```\n- **Option 2 — File Explorer:** Right-click the file → Properties → check **Unblock** → click OK.\n\n**2d. Run the Script**\n\n```powershell\n.\\Install-DevTools.ps1\n```\nThis installs all tools to OneDrive by default [[986841103]].\n\n---\n\n### Step 3: Configure Claude Code\n\nOnce installed, connect Claude Code to your SU account:\n\n1. Open a terminal and type `claude`\n2. Choose your preferred text display style\n3. Select **\"Anthropic Console account\"** (option 2) for your login method\n4. A browser window will open — sign in with your **`netid@syr.edu`** credentials. If prompted, select the **Syracuse University** organization\n5. Authorize Claude Code in the browser\n6. Return to the terminal and press **Enter twice** to accept and trust the folder\n\n**You're all set!** 🎉\n\n---\n\n### Troubleshooting Tips [[986841103]]\n\n- **Script blocked by Windows?** Use `Unblock-File` as described in Step 2c, or bypass for a single session:\n  ```powershell\n  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process\n  ```\n  Or from Command Prompt:\n  ```\n  powershell -ExecutionPolicy Bypass -File .\\Install-DevTools.ps1\n  ```\n- **32-bit systems:** Not supported — only AMD64 and ARM64.\n- **OneDrive unavailable?** Run the script with `-Location Local`.\n- **Network issues?** Some networks may block downloads — verify internet connectivity.\n- **After installation,** restart your terminal/PowerShell session if tools aren't recognized.\n\n---\n\n### Optional Enhancements\n- **GitHub integration** — Use Git to track and review every change Claude Code makes to your files [[986841103]].\n- **VS Code integration** — Follow the [Claude Code VS Code Integration Guide](https://code.claude.com/docs/en/vs-code) for an enhanced development experience [[986841103]].\n\n---\n\n**Sources:**\n- [Claude Code Setup](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) [[986841103]]",
+      "cited_raw": [
+        "986841103"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "986841103",
+          "title": "Claude Code Setup",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup"
+        }
+      ],
+      "hit_expected": [
+        "986841103"
+      ],
+      "missed_expected": [
+        "540934169"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude Code install Windows"
+          },
+          "summary": "query='Claude Code install Windows' → 5 hits: claude-at-syracuse-product-surface-map(wiki,113.85), 986841103(raw,79.0), 488210484(raw,75.0), 540934169(raw,46.5), 522158118(raw,42.0)",
+          "output_chars": 5088
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "986841103"
+          },
+          "summary": "raw 986841103 'Claude Code Setup' (6666 chars)",
+          "output_chars": 6903
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 3882,
+        "output_tokens": 1215,
+        "cache_creation_input_tokens": 1869,
+        "cache_read_input_tokens": 6200
+      },
+      "cost_usd": 0.03874,
+      "latency_ms": 21681,
+      "session_id": "20260518T151815-7df756"
+    }
+  ]
+}

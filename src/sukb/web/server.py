@@ -25,6 +25,8 @@ from ..ingest.dead_letter import clear_failure, list_failures, load_failure
 from ..ingest.puller import ConfluencePuller, PullEvent, load_credentials
 from ..chat import query as query_mod
 from ..chat import sessions as sessions_mod
+from ..chat import agentic_runner as agentic_mod
+from ..chat.agentic_tools import AgenticTools
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -405,6 +407,172 @@ def post_query(body: dict[str, Any]) -> JSONResponse:
         # ANTHROPIC_API_KEY missing or SDK not installed — surface clearly.
         raise HTTPException(503, str(e))
     return JSONResponse(result.to_dict())
+
+
+@app.post("/api/query/stream")
+async def post_query_stream(body: dict[str, Any]):
+    """Streaming chat — yields SSE events the frontend can render progressively.
+
+    Body: {question, mode: 'raw' | 'raw+wiki' | 'agentic'}
+
+    Event protocol (one `data:` JSON object per event line, with `event:` label):
+      - For 'raw' / 'raw+wiki': context_loaded, text_delta..., done | error.
+      - For 'agentic': start, [tool_start, tool_result]..., text_delta...,
+        usage_update, done | error.
+
+    Both modes terminate with exactly one `done` (or `error`) event so the
+    frontend can finalize the assistant turn and save the session.
+    """
+    question = (body.get("question") or "").strip()
+    if not question:
+        raise HTTPException(400, "question is required")
+    mode = body.get("mode") or "raw+wiki"
+    if mode not in ("raw", "raw+wiki", "agentic"):
+        raise HTTPException(400, f"mode must be raw|raw+wiki|agentic, got {mode!r}")
+    config = get_config()
+
+    # We build the SSE generator in a background thread because the Anthropic
+    # SDK is sync — running it on the event loop would block other requests.
+    queue: Queue = Queue(maxsize=256)
+    SENTINEL = object()
+
+    def emit(event: str, data: dict[str, Any]) -> None:
+        queue.put({"event": event, "data": json.dumps(data, ensure_ascii=False)})
+
+    def worker() -> None:
+        try:
+            if mode in ("raw", "raw+wiki"):
+                _run_chat_stream(question, mode, config, emit)
+            else:
+                _run_agentic_stream(question, config, emit)
+        except Exception as e:  # noqa: BLE001
+            emit("error", {"message": str(e)})
+        finally:
+            queue.put(SENTINEL)
+
+    threading.Thread(target=worker, daemon=True).start()
+
+    async def gen():
+        loop = asyncio.get_event_loop()
+        while True:
+            item = await loop.run_in_executor(None, queue.get)
+            if item is SENTINEL:
+                break
+            yield item
+
+    return EventSourceResponse(gen())
+
+
+def _run_chat_stream(question: str, mode: str, config: SyncConfig, emit) -> None:
+    """Stream a single-shot ceiling/baseline answer using the Anthropic SDK's
+    streaming surface. Emits context_loaded, text_delta..., then done."""
+    raw_pages = query_mod.load_raw_corpus(config)
+    wiki_pages = query_mod.load_wiki_corpus(config) if mode == "raw+wiki" else []
+    orientation = query_mod.load_orientation_files(config) if mode == "raw+wiki" else []
+    effective_mode = "raw+wiki" if (mode == "raw+wiki" and wiki_pages) else "raw"
+
+    emit("context_loaded", {
+        "raw_pages_loaded": len(raw_pages),
+        "wiki_pages_loaded": len(wiki_pages),
+        "orientation_files_loaded": len(orientation),
+        "mode": effective_mode,
+    })
+
+    payload = query_mod.build_messages_payload(question, raw_pages, wiki_pages, orientation)
+    client = query_mod._default_client()
+
+    full_answer = ""
+    usage: dict[str, int] = {}
+    t0 = _now_perf()
+    try:
+        with client.messages.stream(**payload) as stream:
+            for event in stream:
+                if getattr(event, "type", None) == "content_block_delta":
+                    delta = getattr(event, "delta", None)
+                    if delta is not None and getattr(delta, "type", None) == "text_delta":
+                        chunk = getattr(delta, "text", "")
+                        if chunk:
+                            full_answer += chunk
+                            emit("text_delta", {"text": chunk})
+            final_message = stream.get_final_message()
+        usage = query_mod._usage_dict(final_message)
+    except Exception as e:  # noqa: BLE001
+        emit("error", {"message": str(e)})
+        return
+
+    citations = query_mod.extract_citations(full_answer, raw_pages)
+    cost = query_mod.estimate_cost_usd(usage)
+    latency_ms = int((_now_perf() - t0) * 1000)
+    emit("done", {
+        "answer": full_answer,
+        "citations": citations,
+        "context_used": {
+            "raw_pages": [p.page_id for p in raw_pages],
+            "wiki_pages": [w.filename for w in wiki_pages],
+            "orientation_files": [o.relpath for o in orientation],
+        },
+        "cost_usd": cost,
+        "latency_ms": latency_ms,
+        "mode": effective_mode,
+        "raw_pages_loaded": len(raw_pages),
+        "wiki_pages_loaded": len(wiki_pages),
+        "orientation_files_loaded": len(orientation),
+        "usage": usage,
+    })
+
+
+def _run_agentic_stream(question: str, config: SyncConfig, emit) -> None:
+    """Drive the agentic tool-use loop, surfacing every tool call + text delta
+    as it happens so the UI can render the navigation live."""
+    tools = AgenticTools(config)
+    emit("context_loaded", {
+        "raw_pages_loaded": len(tools.raw_pages),
+        "wiki_pages_loaded": len(tools.wiki_hubs),
+        "orientation_files_loaded": len(tools.orientation),
+        "mode": "agentic",
+    })
+
+    client = query_mod._default_client()
+    full_answer = ""
+    final_trace: list[dict[str, Any]] = []
+    final_cost = 0.0
+    final_usage: dict[str, int] = {}
+    final_latency = 0
+    iterations = 0
+
+    for ev in agentic_mod.stream_one_query(client, tools, question):
+        name = ev["event"]
+        data = ev["data"]
+        # Track terminal state for citation extraction + session save
+        if name == "text_delta":
+            full_answer += data.get("text", "")
+        elif name == "done":
+            full_answer = data.get("answer", full_answer)
+            final_trace = data.get("trace", [])
+            final_cost = data.get("cost_usd", 0.0)
+            final_usage = data.get("usage", {})
+            final_latency = data.get("latency_ms", 0)
+            iterations = data.get("iterations", 0)
+        # Forward every event to the client untouched, but supplement the
+        # 'done' event with resolved citations so the UI doesn't have to
+        # round-trip through the corpus index.
+        if name == "done":
+            citations = query_mod.extract_citations(full_answer, tools.raw_pages)
+            data = dict(data)
+            data["citations"] = citations
+            data["context_used"] = {
+                "raw_pages_cited": [c["page_id"] for c in citations],
+                "trace_pages": [t["input"].get("id") or t["input"].get("path") for t in final_trace],
+            }
+            data["mode"] = "agentic"
+        emit(name, data)
+        if name in ("done", "error"):
+            return
+
+
+def _now_perf() -> float:
+    import time as _t
+    return _t.perf_counter()
 
 
 @app.get("/api/query/status")

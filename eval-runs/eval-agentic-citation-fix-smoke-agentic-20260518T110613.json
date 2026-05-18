@@ -1,0 +1,226 @@
+{
+  "run_stamp": "20260518T110613",
+  "mode": "agentic",
+  "model": "claude-sonnet-4-6",
+  "total_queries": 3,
+  "completed": 3,
+  "total_cost_usd": 0.106673,
+  "avg_tool_calls_per_query": 2.33,
+  "corpus": {
+    "raw_pages": 29,
+    "wiki_hubs": 2,
+    "orientation_files": 4
+  },
+  "results": [
+    {
+      "id": "q06",
+      "type": "where-do-i",
+      "question": "How do I install Claude Code on Windows?",
+      "expected_pages": [
+        "986841103",
+        "540934169"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a complete guide to installing Claude Code on Windows, based on Syracuse University's official setup documentation [[986841103]]:\n\n---\n\n## 🖥️ Installing Claude Code on Windows\n\n### Step 1: Get Access to Claude Code\nBefore installing, you'll need to purchase or obtain access to Claude Code. See the [Purchase Claude Code and Claude API Access](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/540934169/Purchase+Claude+Code+and+Claude+API+Access) page for details [[986841103]].\n\n---\n\n### Step 2: Install Claude Code & Development Tools\n\nSU provides an **automated PowerShell script** (`Install-DevTools.ps1`) that handles everything. It auto-detects your system architecture (AMD64 or ARM64) and installs all required tools [[986841103]]:\n\n| Tool | Version | Notes |\n|---|---|---|\n| Node.js | 24.12.0 | Portable/embedded |\n| Git Portable | 2.52.0 | Includes Git Bash |\n| Python Embeddable | 3.14.3 | Skipped if system Python detected |\n| VS Code Portable | Latest | Skipped if already installed |\n| GitHub Desktop | Latest | Visual Git interface |\n| PowerShell 7 | Latest | Via winget |\n| **Claude Code** | Latest | Always installs locally |\n\n**A) Set the Execution Policy**\n\nOpen PowerShell and run:\n```powershell\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n\n**B) Download the Script**\n\nDownload [`Install-DevTools.ps1`](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) from the setup page and save it (e.g., to your Downloads folder).\n\n**C) Remove the \"Mark of the Web\" (Windows Block)**\n\nWindows blocks scripts downloaded from the internet. Unblock the file first using **one** of these methods:\n\n- **PowerShell (recommended):**\n  ```powershell\n  Unblock-File -Path \"$HOME\\Downloads\\Install-DevTools.ps1\"\n  ```\n- **File Properties:** Right-click the file → Properties → check **Unblock** at the bottom → click OK.\n\n**D) Run the Script**\n\n```powershell\n# Installs all tools to OneDrive by default (syncs across devices)\n.\\Install-DevTools.ps1\n```\n\n> 📁 By default, tools install to `%OneDrive%\\Apps-SU\\[arch]\\<ToolName>`. Claude Code itself always installs locally to `%USERPROFILE%\\.local\\bin` [[986841103]].\n\n---\n\n### Step 3: Configure Claude Code\n\nOnce installed, connect Claude Code to your SU account [[986841103]]:\n\n1. Open a terminal and type: `claude`\n2. Choose your preferred text display style.\n3. Select **\"Anthropic Console account\"** (option 2) for your login method.\n4. A browser window will open — sign in with your **`netid@syr.edu`** credentials. If prompted, select the **Syracuse University** organization.\n5. **Authorize Claude Code** in the browser.\n6. Return to the terminal and **press Enter twice** to accept and trust the folder.\n\n✅ **You're all set!**\n\n---\n\n### Troubleshooting Tips\n\n- **Script won't run?** Try bypassing the execution policy for a single session:\n  ```powershell\n  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process\n  ```\n  Or from Command Prompt: `powershell -ExecutionPolicy Bypass -File .\\Install-DevTools.ps1`\n- **No OneDrive?** Use the `-Location Local` flag when running the script.\n- **32-bit systems** are not supported — only AMD64 and ARM64.\n- After installation, **restart your terminal** if tools aren't recognized [[986841103]].\n\n---\n\n### Optional Add-ons\n- **GitHub Integration:** Use Git to track every change Claude Code makes, create branches to experiment safely, and roll back if needed [[986841103]].\n- **VS Code Integration:** Follow the [Claude Code VS Code Integration Guide](https://code.claude.com/docs/en/vs-code) for an enhanced coding experience [[986841103]].\n\n---\n\n**Sources:**\n- [Claude Code Setup](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) [[986841103]]",
+      "cited_raw": [
+        "986841103"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "986841103",
+          "title": "Claude Code Setup",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup"
+        }
+      ],
+      "hit_expected": [
+        "986841103"
+      ],
+      "missed_expected": [
+        "540934169"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude Code install Windows"
+          },
+          "summary": "query='Claude Code install Windows' → 5 hits: claude-at-syracuse-product-surface-map(wiki,113.85), 986841103(raw,79.0), 488210484(raw,75.0), 540934169(raw,46.5), 522158118(raw,42.0)",
+          "output_chars": 5088
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "986841103"
+          },
+          "summary": "raw 986841103 'Claude Code Setup' (6666 chars)",
+          "output_chars": 6903
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 5635,
+        "output_tokens": 1207,
+        "cache_creation_input_tokens": 2275,
+        "cache_read_input_tokens": 3006
+      },
+      "cost_usd": 0.044443,
+      "latency_ms": 17960,
+      "session_id": "20260518T150631-61efda"
+    },
+    {
+      "id": "q10",
+      "type": "how-to",
+      "question": "How do I create a new mentor on the Clementine platform?",
+      "expected_pages": [
+        "535068673",
+        "567279621"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a step-by-step guide to creating a new mentor on the Clementine (mentorAI) platform [[535068673]]:\n\n---\n\n## Creating a New Mentor on mentorAI\n\n### Step 1: Start a New Mentor\nClick the **\"New Mentor\"** button on your dashboard.\n\n---\n\n### Step 2: Input Mentor Information\nFill in the following details:\n\n- **Name** – Enter the mentor's name. This is the primary identifier mentees will see when looking to connect.\n- **Description** – Write a brief bio covering the mentor's background, skills, and the type of mentorship offered (e.g., career advice, skill development).\n- **Category** – Select the appropriate category based on the mentor's expertise (e.g., Astronomy, Art, Anthropology). This helps mentees find relevant mentors.\n- **Mentor Visibility** – Choose whether the mentor is visible to all students, select groups, or kept private.\n- **Image** – Optionally upload a profile picture to make the profile more engaging and relatable.\n\n---\n\n### Step 3: Configure Prompts\nSet up the interaction prompts to shape how the mentor engages with mentees:\n\n- **System Prompts** – These are pre-populated with suggested interaction styles. Review and edit them to match the mentor's focus and tone.\n- **Proactive Prompts** – Add prompts that initiate discussions with mentees. Tailor these to encourage specific types of interactions.\n- **Guided Prompts** – Set structured guidance for conversations, relevant to the mentor's expertise and the mentee's needs.\n\n> 💡 **Tip:** Add your configured prompts at the bottom of the default prompts for more effective mentoring.\n\n---\n\n### Step 4: Save\nClick the **\"Save\"** button to submit the new mentor profile.\n\n---\n\nFor additional configuration options (such as LLM selection, datasets, and safety settings), you can refer to the **mentorAI Settings & Options** page.\n\n---\n\n**Sources:**\n- [mentorAI Creating A Mentor](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor) [[535068673]]",
+      "cited_raw": [
+        "535068673"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "535068673",
+          "title": "mentorAI Creating A Mentor",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor"
+        }
+      ],
+      "hit_expected": [
+        "535068673"
+      ],
+      "missed_expected": [
+        "567279621"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "read_index",
+          "input": {
+            "path": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md"
+          },
+          "summary": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md (5839 chars)",
+          "output_chars": 5964
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "535068673"
+          },
+          "summary": "raw 535068673 'mentorAI Creating A Mentor' (2876 chars)",
+          "output_chars": 3153
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 4857,
+        "output_tokens": 646,
+        "cache_creation_input_tokens": 810,
+        "cache_read_input_tokens": 4509
+      },
+      "cost_usd": 0.028651,
+      "latency_ms": 11366,
+      "session_id": "20260518T150648-0c43bc"
+    },
+    {
+      "id": "q15",
+      "type": "where-do-i",
+      "question": "Where can I find example uses of Claude for academic work?",
+      "expected_pages": [
+        "511246346",
+        "511279124",
+        "500236296",
+        "572194844",
+        "516325410"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Great news — Syracuse University has a dedicated set of example use pages for Claude, including two that are especially relevant for academic work. Here's a summary:\n\n---\n\n## 📚 Example Uses of Claude for Academic Work\n\n### 1. AI Research Assistant with Claude [[572194844]]\nThis is the most comprehensive academic example. It covers:\n\n- **Uploading documents** (PDFs, Word docs, research articles) — up to 5 files per conversation — and asking Claude to summarize, extract quotes, or explain theories\n- **Using Projects** to organize readings by course or topic, so you don't have to re-upload materials each time\n- **Multi-Document Analysis** — upload multiple sources and ask Claude to synthesize them into a comparison table or literature review\n- **Creating Artifacts** — editable outlines, summaries, and literature reviews in a side panel\n- **Web Search Integration** — Claude can search for current research and provide citations\n- **Extended Thinking** — for deeper analysis of complex research questions\n\n**Example prompts provided include:**\n- *\"Summarize this research article in 3–4 bullet points…\"*\n- *\"Compare these two articles on [topic]… create a comparison table\"*\n- *\"Create an outline for a short literature review on [topic] using the uploaded sources\"*\n- *\"Extract 5–7 key quotes from this article that support the main argument\"*\n\n> ⚠️ **Important reminder:** Always verify sources through SU Libraries for peer-reviewed material, and always cite original sources — Claude is a research aid, not a replacement for critical thinking.\n\n---\n\n### 2. Claude Study Project [[511279124]]\nThis example shows how to use Claude's **Study Project** feature for mastering course content:\n\n- Create a Study Project from Claude's home screen\n- Upload lecture slides, PDFs, or notes\n- Ask Claude to **generate flashcards**, **quiz you**, or **summarize chapters**\n\n---\n\nThere are also three other example use pages (meeting summaries, career/resume help, and drafting emails) if those are relevant to you.\n\n---\n\n## Sources\n- [AI Research Assistant with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude) [[572194844]]\n- [Claude Study Project](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project) [[511279124]]",
+      "cited_raw": [
+        "572194844",
+        "511279124"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "572194844",
+          "title": "AI Research Assistant with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude"
+        },
+        {
+          "page_id": "511279124",
+          "title": "Claude Study Project",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project"
+        }
+      ],
+      "hit_expected": [
+        "511279124",
+        "572194844"
+      ],
+      "missed_expected": [
+        "511246346",
+        "500236296",
+        "516325410"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "read_index",
+          "input": {
+            "path": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md"
+          },
+          "summary": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md (5839 chars)",
+          "output_chars": 5964
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "572194844"
+          },
+          "summary": "raw 572194844 'AI Research Assistant with Claude' (5630 chars)",
+          "output_chars": 5930
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "511279124"
+          },
+          "summary": "raw 511279124 'Claude Study Project' (579 chars)",
+          "output_chars": 840
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 3,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 5827,
+        "output_tokens": 782,
+        "cache_creation_input_tokens": 804,
+        "cache_read_input_tokens": 4509
+      },
+      "cost_usd": 0.033579,
+      "latency_ms": 14632,
+      "session_id": "20260518T150707-b592f8"
+    }
+  ]
+}

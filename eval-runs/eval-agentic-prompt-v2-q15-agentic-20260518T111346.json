@@ -1,0 +1,144 @@
+{
+  "run_stamp": "20260518T111346",
+  "mode": "agentic",
+  "model": "claude-sonnet-4-6",
+  "total_queries": 1,
+  "completed": 1,
+  "total_cost_usd": 0.05513,
+  "avg_tool_calls_per_query": 6.0,
+  "corpus": {
+    "raw_pages": 29,
+    "wiki_hubs": 2,
+    "orientation_files": 4
+  },
+  "results": [
+    {
+      "id": "q15",
+      "type": "where-do-i",
+      "question": "Where can I find example uses of Claude for academic work?",
+      "expected_pages": [
+        "511246346",
+        "511279124",
+        "500236296",
+        "572194844",
+        "516325410"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a full overview of the **5 official Claude example use pages** available to Syracuse University students and staff:\n\n---\n\n## 📚 Claude Example Uses for Academic Work\n\n### 1. 🔬 AI Research Assistant\nUse Claude as a personal research assistant for literature reviews, multi-document analysis, and source comparison [[572194844]]. You can:\n- Upload up to 5 PDFs/Word docs per conversation and ask Claude to summarize, compare, or extract key quotes.\n- Use **Projects** to organize readings by course — Claude remembers uploaded files across conversations all semester.\n- Generate editable **Artifacts** for outlines and literature reviews.\n- Use **Extended Thinking** for deep analysis of complex research questions.\n- Request specific formats like APA-style annotated bibliographies or comparison tables.\n\n---\n\n### 2. 📖 Study Project\nTurn your course materials into active study tools [[511279124]]. You can:\n- Upload lecture slides, PDFs, or notes into a **Study Project**.\n- Ask Claude to summarize chapters, explain key concepts, generate **flashcards**, or quiz you on the material.\n\n---\n\n### 3. 💼 Career Project\nPrepare for internships and job applications [[511246346]]. You can:\n- Upload your resume and a job description, then ask Claude to tailor your resume for the role.\n- Draft personalized cover letters and practice behavioral interview questions.\n\n---\n\n### 4. 📧 Drafting Emails\nWrite clear, professional emails quickly [[516325410]]. Examples include:\n- Emails to professors (e.g., requesting extensions or clarifications)\n- Thank-you emails after career fairs or informational interviews\n- Internship follow-up and group project coordination emails\n- Use Claude's **Artifact panel** for easy editing and copy/paste into your email client.\n\n---\n\n### 5. 📋 Meeting Summaries\nTurn Zoom or Teams transcripts into actionable summaries [[500236296]]. Options include:\n- Formal meeting minutes\n- Topic-based summaries\n- Action items/task lists only\n- Quick 5-minute summaries\n- A pre-built **Meeting Transcripts Project** is available at [claude.ai](https://claude.ai/projects?search=Meeting+Transcripts&category=team) with prompts already in place.\n\n---\n\nAll of these examples are available through Syracuse University's Claude Enterprise access. You can get started at **getclaude.syr.edu**.\n\n---\n\n### Sources\n- [AI Research Assistant with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude) [[572194844]]\n- [Claude Study Project](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project) [[511279124]]\n- [Claude Career Project](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511246346/Claude+Career+Project) [[511246346]]\n- [Drafting Emails with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/516325410/Drafting+Emails+with+Claude) [[516325410]]\n- [Meeting Summaries with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/500236296/Meeting+Summaries+with+Claude) [[500236296]]",
+      "cited_raw": [
+        "572194844",
+        "511279124",
+        "511246346",
+        "516325410",
+        "500236296"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "572194844",
+          "title": "AI Research Assistant with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude"
+        },
+        {
+          "page_id": "511279124",
+          "title": "Claude Study Project",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project"
+        },
+        {
+          "page_id": "511246346",
+          "title": "Claude Career Project",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511246346/Claude+Career+Project"
+        },
+        {
+          "page_id": "516325410",
+          "title": "Drafting Emails with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/516325410/Drafting+Emails+with+Claude"
+        },
+        {
+          "page_id": "500236296",
+          "title": "Meeting Summaries with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/500236296/Meeting+Summaries+with+Claude"
+        }
+      ],
+      "hit_expected": [
+        "511246346",
+        "511279124",
+        "500236296",
+        "572194844",
+        "516325410"
+      ],
+      "missed_expected": [],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "read_index",
+          "input": {
+            "path": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md"
+          },
+          "summary": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md (5839 chars)",
+          "output_chars": 5964
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "500236296"
+          },
+          "summary": "raw 500236296 'Meeting Summaries with Claude' (5305 chars)",
+          "output_chars": 5593
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "511246346"
+          },
+          "summary": "raw 511246346 'Claude Career Project' (627 chars)",
+          "output_chars": 891
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "511279124"
+          },
+          "summary": "raw 511279124 'Claude Study Project' (579 chars)",
+          "output_chars": 840
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "516325410"
+          },
+          "summary": "raw 516325410 'Drafting Emails with Claude' (4320 chars)",
+          "output_chars": 4602
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "572194844"
+          },
+          "summary": "raw 572194844 'AI Research Assistant with Claude' (5630 chars)",
+          "output_chars": 5930
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 6,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 9012,
+        "output_tokens": 1136,
+        "cache_creation_input_tokens": 2652,
+        "cache_read_input_tokens": 3696
+      },
+      "cost_usd": 0.05513,
+      "latency_ms": 23663,
+      "session_id": "20260518T151410-be98ac"
+    }
+  ]
+}

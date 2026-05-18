@@ -115,9 +115,82 @@ def test_load_wiki_corpus_excludes_drafts(tmp_path):
     assert hubs[0].synthesizes == ["1", "2", "3"]
 
 
+def test_load_wiki_corpus_excludes_index_type(tmp_path):
+    """`wiki/index.md` (type: index) is orientation, not a hub. It must not
+    appear in `load_wiki_corpus` output even when `status: reviewed`."""
+    cfg = _make_config(tmp_path)
+    wiki = cfg.output_dir / "wiki"
+    wiki.mkdir(parents=True)
+    (wiki / "approved-tools.md").write_text(
+        "---\ntitle: Approved Tools\ntype: hub\nstatus: reviewed\nsynthesizes: ['1','2','3']\n---\n"
+        "Hub body.\n",
+        encoding="utf-8",
+    )
+    (wiki / "index.md").write_text(
+        "---\ntitle: Wiki Index\ntype: index\nstatus: reviewed\nsynthesizes: []\n---\n"
+        "Index body.\n",
+        encoding="utf-8",
+    )
+    hubs = q.load_wiki_corpus(cfg)
+    assert {h.filename for h in hubs} == {"approved-tools.md"}
+
+
 def test_load_wiki_corpus_returns_empty_when_dir_missing(tmp_path):
     cfg = _make_config(tmp_path)
     assert q.load_wiki_corpus(cfg) == []
+
+
+# --- orientation files ------------------------------------------------------
+
+
+def test_load_orientation_files_picks_up_all_four_layers(tmp_path):
+    """CLAUDE.md, global index, wiki/index, and every raw/**/index.md."""
+    cfg = _make_config(tmp_path)
+    cfg.output_dir.mkdir(parents=True)
+    (cfg.output_dir / "CLAUDE.md").write_text("# Agent Rules\nRules body.\n", encoding="utf-8")
+    (cfg.output_dir / "index.md").write_text("# SU KB\nGlobal map body.\n", encoding="utf-8")
+
+    wiki = cfg.output_dir / "wiki"
+    wiki.mkdir()
+    (wiki / "index.md").write_text(
+        "---\ntitle: Wiki Index\ntype: index\nstatus: reviewed\n---\nHub map body.\n",
+        encoding="utf-8",
+    )
+
+    space = cfg.raw_path / "knowledge-bases" / "Artificial Intelligence (AI)"
+    space.mkdir(parents=True)
+    (space / "index.md").write_text("# Space Index — ITSAI\nSpace routing body.\n", encoding="utf-8")
+
+    files = q.load_orientation_files(cfg)
+    relpaths = [f.relpath for f in files]
+    assert relpaths == [
+        "CLAUDE.md",
+        "index.md",
+        "wiki/index.md",
+        "raw/knowledge-bases/Artificial Intelligence (AI)/index.md",
+    ]
+    # Titles resolve from frontmatter when present, otherwise from first H1
+    assert files[0].title == "Agent Rules"          # H1 fallback
+    assert files[1].title == "SU KB"                # H1 fallback
+    assert files[2].title == "Wiki Index"           # frontmatter
+    assert files[3].title == "Space Index — ITSAI"  # H1 fallback
+    assert "Rules body." in files[0].body
+    assert "Space routing body." in files[3].body
+
+
+def test_load_orientation_files_skips_missing(tmp_path):
+    """Missing files are silently skipped — the corpus still works without orientation."""
+    cfg = _make_config(tmp_path)
+    cfg.output_dir.mkdir(parents=True)
+    # Only the global CLAUDE.md exists; no index.md, no wiki/, no raw/.
+    (cfg.output_dir / "CLAUDE.md").write_text("# Rules\nBody.\n", encoding="utf-8")
+    files = q.load_orientation_files(cfg)
+    assert [f.relpath for f in files] == ["CLAUDE.md"]
+
+
+def test_load_orientation_files_returns_empty_when_output_missing(tmp_path):
+    cfg = _make_config(tmp_path)  # output_dir doesn't exist
+    assert q.load_orientation_files(cfg) == []
 
 
 # --- citation parsing -------------------------------------------------------
@@ -169,6 +242,32 @@ def test_serialize_corpus_omits_wiki_block_when_empty():
     text = q.serialize_corpus([q.RawPage("100", "T", "http://x", [], "body", "p.md")], [])
     assert "=== RAW PAGES ===" in text
     assert "=== WIKI HUBS ===" not in text
+    assert "=== ORIENTATION FILES ===" not in text
+
+
+def test_serialize_corpus_emits_orientation_block_before_raw():
+    """When orientation files are provided they head the corpus so the model
+    sees them before the bulk of raw pages."""
+    raw = [q.RawPage("100", "T", "http://x", [], "raw body", "p.md")]
+    wiki = [q.WikiHub("Hub", "hub.md", ["100", "200", "300"], "wiki body")]
+    orientation = [
+        q.OrientationFile("CLAUDE.md", "Agent Rules", "rules body"),
+        q.OrientationFile("index.md", "SU KB", "global index body"),
+    ]
+    text = q.serialize_corpus(raw, wiki, orientation)
+    orient_pos = text.index("=== ORIENTATION FILES ===")
+    raw_pos = text.index("=== RAW PAGES ===")
+    wiki_pos = text.index("=== WIKI HUBS ===")
+    assert orient_pos < raw_pos < wiki_pos
+    assert "path: CLAUDE.md" in text
+    assert "title: Agent Rules" in text
+    assert "rules body" in text
+
+
+def test_serialize_corpus_omits_orientation_block_when_empty():
+    raw = [q.RawPage("100", "T", "http://x", [], "body", "p.md")]
+    text = q.serialize_corpus(raw, [], orientation_files=[])
+    assert "=== ORIENTATION FILES ===" not in text
 
 
 def test_build_messages_payload_sets_cache_control():
@@ -179,6 +278,8 @@ def test_build_messages_payload_sets_cache_control():
     # System is two blocks: instructions, then cached corpus
     assert len(payload["system"]) == 2
     assert payload["system"][0]["text"].startswith("You are the Syracuse University")
+    assert "original Confluence" in payload["system"][0]["text"]
+    assert "Markdown link" in payload["system"][0]["text"]
     assert payload["system"][1]["cache_control"] == {"type": "ephemeral"}
 
 
@@ -264,6 +365,35 @@ def test_answer_query_falls_back_to_raw_when_wiki_missing(tmp_path):
     # Wiki dir doesn't exist → effective_mode should be raw
     assert result.mode == "raw"
     assert result.wiki_pages_loaded == 0
+
+
+def test_answer_query_loads_orientation_in_raw_plus_wiki_mode(tmp_path):
+    """When mode is raw+wiki the orientation files are loaded into the prompt;
+    when mode is raw they are not. This is what makes the ceiling eval the
+    actual ceiling — orientation + hubs + raw all in one prompt."""
+    cfg = _make_config(tmp_path)
+    _write_page(cfg.raw_path / "AI", "100", "P", "body")
+    (cfg.output_dir / "CLAUDE.md").write_text("# Rules\nbody\n", encoding="utf-8")
+    wiki = cfg.output_dir / "wiki"
+    wiki.mkdir()
+    (wiki / "hub.md").write_text(
+        "---\ntitle: Hub\ntype: hub\nstatus: reviewed\nsynthesizes: ['100','200','300']\n---\nhub body\n",
+        encoding="utf-8",
+    )
+
+    stub_wiki_mode = _StubClient(text="ok [[100]].", usage={"input_tokens": 1, "output_tokens": 1})
+    result_wiki = q.answer_query("q?", config=cfg, mode="raw+wiki", client=stub_wiki_mode)
+    assert result_wiki.mode == "raw+wiki"
+    assert result_wiki.orientation_files_loaded >= 1
+    assert "CLAUDE.md" in result_wiki.context_used["orientation_files"]
+    # Orientation block must appear in the serialized prompt
+    assert "=== ORIENTATION FILES ===" in stub_wiki_mode.messages.last_payload["system"][1]["text"]
+
+    stub_raw_mode = _StubClient(text="ok [[100]].", usage={"input_tokens": 1, "output_tokens": 1})
+    result_raw = q.answer_query("q?", config=cfg, mode="raw", client=stub_raw_mode)
+    assert result_raw.mode == "raw"
+    assert result_raw.orientation_files_loaded == 0
+    assert "=== ORIENTATION FILES ===" not in stub_raw_mode.messages.last_payload["system"][1]["text"]
 
 
 def test_answer_query_rejects_empty_question(tmp_path):

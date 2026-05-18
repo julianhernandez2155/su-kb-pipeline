@@ -45,14 +45,18 @@ pages in the corpus provided below.
 RULES:
 1. Every factual claim MUST cite the source page using the `[[<page-id>]]` \
 format inline at the end of the sentence. Example: "Claude retains chats for \
-2 years [[488210484]]."
+2 years [[488210484]]." These wiki-style ids are for backend/admin traceability.
 2. If the corpus does not contain enough information to answer the question, \
 say so explicitly. Do NOT make up content. Acceptable phrasings: "The corpus \
 does not specify..." or "I don't have information on..."
 3. If the question requires synthesizing across multiple pages, cite each \
 page you draw from.
 4. Prefer concise, structured answers. Use bullet points or short paragraphs.
-5. End every answer with a "Sources:" line listing the page_ids you cited.\
+5. End every answer with a "Sources:" section listing each cited page as a \
+Markdown link to its original Confluence `source_url`, followed by the trace \
+id. Example: "- [Claude FAQ](https://answers.atlassian.syr.edu/...) \
+[[488210484]]". The Confluence link is the user-facing citation; the `[[id]]` \
+is the backend trace citation.\
 """
 
 # `[[488210484]]` or `[[488210484 - Some Title]]` — capture the leading digits.
@@ -100,6 +104,20 @@ class WikiHub:
 
 
 @dataclass
+class OrientationFile:
+    """A `CLAUDE.md` or `index.md` that helps the model navigate the corpus.
+
+    Distinct from wiki hubs: orientation files describe relationships and route
+    questions; hubs synthesize content with citations. The plan's architectural
+    pivot (`next-phase-plan-v2.md`) treats these as load-bearing for the
+    agentic-MCP architecture.
+    """
+    relpath: str  # path relative to output_dir, e.g. "CLAUDE.md" or "raw/knowledge-bases/.../index.md"
+    title: str
+    body: str
+
+
+@dataclass
 class QueryResult:
     answer: str
     citations: list[dict[str, Any]]
@@ -109,6 +127,7 @@ class QueryResult:
     mode: str
     raw_pages_loaded: int
     wiki_pages_loaded: int
+    orientation_files_loaded: int = 0
     usage: dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -170,8 +189,9 @@ def load_wiki_corpus(config: SyncConfig) -> list[WikiHub]:
     """Walk `output/wiki/` and return reviewed+evergreen hubs.
 
     Draft hubs are excluded — the wiki-operating-model rule is "human promotes
-    before it counts." If the wiki directory doesn't exist (Step 2 runs before
-    Step 5), return [].
+    before it counts." Non-hub files (`type: index`, etc.) are also excluded
+    here; the wiki index is loaded via `load_orientation_files` instead.
+    If the wiki directory doesn't exist (Step 2 runs before Step 5), return [].
     """
     wiki_root = config.output_dir / "wiki"
     if not wiki_root.exists():
@@ -184,6 +204,8 @@ def load_wiki_corpus(config: SyncConfig) -> list[WikiHub]:
         status = str(fm.get("status") or "draft").lower()
         if status not in ("reviewed", "evergreen"):
             continue  # don't expose drafts or deprecated hubs to queries
+        if str(fm.get("type") or "hub").lower() != "hub":
+            continue  # type: index files are orientation, not hubs
         hubs.append(
             WikiHub(
                 title=str(fm.get("title") or md.stem),
@@ -196,12 +218,77 @@ def load_wiki_corpus(config: SyncConfig) -> list[WikiHub]:
     return hubs
 
 
+def load_orientation_files(config: SyncConfig) -> list[OrientationFile]:
+    """Return the layered navigation surfaces: `CLAUDE.md` + every `index.md`.
+
+    Loads, in stable order:
+      1. `output/CLAUDE.md` (agent rules)
+      2. `output/index.md` (global map)
+      3. `output/wiki/index.md` (hub map)
+      4. every `output/raw/**/index.md` (space-level indexes), sorted by path
+
+    The plan's architectural pivot treats these as load-bearing for the
+    agentic MCP shape: they let the model orient before drilling down,
+    which is what Step 6 (ceiling eval) and Step 7 (agentic sim) measure.
+    Missing files are silently skipped — the corpus can still answer
+    questions without them.
+    """
+    output_dir = config.output_dir
+    if not output_dir.exists():
+        return []
+
+    files: list[OrientationFile] = []
+
+    def _maybe_load(p: Path) -> None:
+        if not p.exists() or not p.is_file():
+            return
+        text = p.read_text(encoding="utf-8")
+        fm, body = _split_frontmatter(text)
+        title = str(fm.get("title") or "")
+        if not title:
+            # First H1 from body, else relpath
+            for line in body.splitlines():
+                if line.startswith("# "):
+                    title = line[2:].strip()
+                    break
+        relpath = str(p.relative_to(output_dir)).replace("\\", "/")
+        files.append(OrientationFile(relpath=relpath, title=title or relpath, body=body.strip()))
+
+    _maybe_load(output_dir / "CLAUDE.md")
+    _maybe_load(output_dir / "index.md")
+    _maybe_load(output_dir / "wiki" / "index.md")
+
+    raw_root = output_dir / "raw"
+    if raw_root.exists():
+        for idx in sorted(raw_root.rglob("index.md")):
+            _maybe_load(idx)
+
+    return files
+
+
 # --- prompt assembly --------------------------------------------------------
 
 
-def serialize_corpus(raw_pages: list[RawPage], wiki_pages: list[WikiHub]) -> str:
-    """Stitch the corpus into the single big text block we cache."""
-    parts: list[str] = ["=== RAW PAGES ==="]
+def serialize_corpus(
+    raw_pages: list[RawPage],
+    wiki_pages: list[WikiHub],
+    orientation_files: list[OrientationFile] | None = None,
+) -> str:
+    """Stitch the corpus into the single big text block we cache.
+
+    Order: orientation files → raw pages → wiki hubs. Orientation goes first
+    because it's how the model is meant to navigate the rest.
+    """
+    parts: list[str] = []
+    if orientation_files:
+        parts.append("=== ORIENTATION FILES ===")
+        for o in orientation_files:
+            parts.append(
+                f"\n--- path: {o.relpath}, title: {o.title} ---\n"
+                f"{o.body}\n"
+            )
+        parts.append("")
+    parts.append("=== RAW PAGES ===")
     for p in raw_pages:
         parts.append(
             f"\n--- page_id: {p.page_id}, title: {p.title}, source_url: {p.source_url} ---\n"
@@ -222,6 +309,7 @@ def build_messages_payload(
     question: str,
     raw_pages: list[RawPage],
     wiki_pages: list[WikiHub],
+    orientation_files: list[OrientationFile] | None = None,
 ) -> dict[str, Any]:
     """Return the kwargs dict to pass to `client.messages.create`."""
     return {
@@ -231,7 +319,7 @@ def build_messages_payload(
             {"type": "text", "text": SYSTEM_INSTRUCTIONS},
             {
                 "type": "text",
-                "text": serialize_corpus(raw_pages, wiki_pages),
+                "text": serialize_corpus(raw_pages, wiki_pages, orientation_files),
                 "cache_control": {"type": "ephemeral"},
             },
         ],
@@ -304,12 +392,13 @@ def answer_query(
 
     raw_pages = load_raw_corpus(config, max_pages=max_pages)
     wiki_pages = load_wiki_corpus(config) if mode == "raw+wiki" else []
+    orientation = load_orientation_files(config) if mode == "raw+wiki" else []
     effective_mode = "raw+wiki" if (mode == "raw+wiki" and wiki_pages) else "raw"
 
     if client is None:
         client = _default_client()
 
-    payload = build_messages_payload(question, raw_pages, wiki_pages)
+    payload = build_messages_payload(question, raw_pages, wiki_pages, orientation)
     t0 = time.perf_counter()
     response = client.messages.create(**payload)
     latency_ms = int((time.perf_counter() - t0) * 1000)
@@ -325,12 +414,14 @@ def answer_query(
         context_used={
             "raw_pages": [p.page_id for p in raw_pages],
             "wiki_pages": [w.filename for w in wiki_pages],
+            "orientation_files": [o.relpath for o in orientation],
         },
         cost_usd=cost,
         latency_ms=latency_ms,
         mode=effective_mode,
         raw_pages_loaded=len(raw_pages),
         wiki_pages_loaded=len(wiki_pages),
+        orientation_files_loaded=len(orientation),
         usage=usage,
     )
 
