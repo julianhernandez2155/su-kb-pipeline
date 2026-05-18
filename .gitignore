@@ -24,3 +24,4 @@ output/query-sessions/*
 # Runtime junk at project root
 job.json
 response.json
+.uvicorn*.log
