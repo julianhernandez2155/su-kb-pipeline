@@ -11,6 +11,7 @@ This directory holds ADRs (Architecture Decision Records) for `su-kb-pipeline` i
 | [0003](0003-rag-pipeline-mcp-architecture.md) | RAG-pipeline MCP architecture (original) | superseded by [0004](0004-agentic-tool-surface-mcp-architecture.md) | 2026-05-05 |
 | [0004](0004-agentic-tool-surface-mcp-architecture.md) | Agentic tool-surface MCP architecture | accepted | 2026-05-13 |
 | [0005](0005-src-layout-and-sukb-package-rename.md) | `src/` layout + `sukb` package rename | accepted | 2026-05-14 |
+| [0006](0006-visibility-metadata-is-descriptive.md) | Visibility metadata is descriptive, not enforcement | accepted | 2026-05-19 |
 
 ## Adding a new ADR
 

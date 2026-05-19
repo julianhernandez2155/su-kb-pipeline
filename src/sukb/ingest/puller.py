@@ -23,7 +23,17 @@ from .attachments import download_attachments, verify_attachment_references
 from ..config import SyncConfig
 from .converter import convert_page
 from .dead_letter import write_failure
-from .frontmatter import PageMeta, build_frontmatter, canonical_filename, content_hash, sanitize_filename_title, serialize, validate
+from .frontmatter import (
+    PageMeta,
+    build_frontmatter,
+    canonical_filename,
+    content_hash,
+    find_existing_page_file,
+    read_existing_frontmatter,
+    sanitize_filename_title,
+    serialize,
+    validate,
+)
 from .state import SyncState
 from .wikilinks import CorpusIndex, DefaultLinkResolver
 
@@ -165,9 +175,16 @@ class ConfluencePuller:
         return results[0]
 
     def list_pages(self, space_id: str) -> Iterator[dict[str, Any]]:
+        """List pages in a space, metadata-only (no body).
+
+        Body and labels are fetched per-page via `get_page_full` only when
+        `should_skip_by_version` decides the page needs re-ingestion. Saves
+        body bytes on the list call and lets us short-circuit before the
+        expensive convert step.
+        """
         cursor: str | None = None
         while True:
-            params: dict[str, Any] = {"body-format": "storage", "limit": 250}
+            params: dict[str, Any] = {"limit": 250}
             if cursor:
                 params["cursor"] = cursor
             data = self._get(f"{self.api_base}/spaces/{space_id}/pages", params=params)
@@ -176,6 +193,34 @@ class ConfluencePuller:
             cursor = _cursor_from_next(data)
             if not cursor:
                 break
+
+    def get_page_full(self, page_id: str) -> tuple[dict[str, Any], list[str]]:
+        """Fetch one page's body + labels, folding both into a single call.
+
+        Tries `?body-format=storage&include-labels=true`. If the deployment
+        rejects `include-labels` (400) or returns no inline labels, falls back
+        to a separate `/pages/{id}/labels` call. Returns (raw_page, labels).
+        """
+        params: dict[str, Any] = {"body-format": "storage", "include-labels": "true"}
+        try:
+            data = self._get(f"{self.api_base}/pages/{page_id}", params=params)
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 400:
+                params.pop("include-labels", None)
+                data = self._get(f"{self.api_base}/pages/{page_id}", params=params)
+            else:
+                raise
+
+        labels: list[str] | None = None
+        labels_field = data.get("labels")
+        if isinstance(labels_field, dict):
+            results = labels_field.get("results", [])
+            labels = [lbl.get("name") for lbl in results if lbl.get("name")]
+
+        if labels is None:
+            labels = self.get_page_labels(page_id)
+
+        return data, labels
 
     def get_page_ancestors(self, page_id: str) -> list[dict[str, Any]]:
         data = self._get(f"{self.api_base}/pages/{page_id}/ancestors")
@@ -308,18 +353,43 @@ class ConfluencePuller:
         title_cache: dict[str, str] = {pid: t[0] for pid, t in corpus.pages_by_id.items()}
 
         # 3. Per-page processing
-        for page in all_pages:
-            pid = str(page.get("id"))
-            title = page.get("title", "")
-            version_no = int((page.get("version") or {}).get("number") or 1)
-            body_storage = ((page.get("body") or {}).get("storage") or {}).get("value", "")
-            last_modified = (page.get("version") or {}).get("createdAt", "")
+        for page_meta in all_pages:
+            pid = str(page_meta.get("id"))
+            title = page_meta.get("title", "")
+            version_no = int((page_meta.get("version") or {}).get("number") or 1)
+            last_modified = (page_meta.get("version") or {}).get("createdAt", "")
             source_url = _build_source_url(space_key, pid, title)
 
             summary.pages_total += 1
 
+            # Metadata-first short-circuit: if version matches a prior
+            # successful sync, skip body fetch + convert entirely. Safe under
+            # our deterministic converter — same source version → same output
+            # markdown → same content_hash.
+            if state.should_skip_by_version(pid, version_no):
+                prior = state.pages.get(pid)
+                summary.pages_skipped += 1
+                yield PullEvent("page_skipped", space_key, {
+                    "page_id": pid, "title": title,
+                    "reason": "version unchanged (metadata-first, no body fetch)",
+                })
+                if prior is not None:
+                    state.record(pid, prior.version, prior.content_hash, _now_iso(), "skipped")
+                    state.save()
+                continue
+
+            # Pre-init so the except handler at the end of this loop body can
+            # still reference body_storage if get_page_full itself raises.
+            body_storage = ""
             try:
-                # Conversion (no skip yet — we need the hash to decide).
+                # Fetch body + labels (folded into one call when supported).
+                page_full, labels = self.get_page_full(pid)
+                # Defensive: API anomaly (missing body/storage/value keys) is
+                # NOT the same as "empty page". Raise so the page goes to the
+                # dead-letter; an empty `value: ""` is allowed through.
+                body_storage = _extract_storage_body(page_full)
+
+                # Conversion
                 resolver = DefaultLinkResolver(
                     corpus=corpus,
                     current_space_key=space_key,
@@ -334,7 +404,10 @@ class ConfluencePuller:
                     children_for_page=children,
                 )
 
-                # Skip if version + hash unchanged
+                # Belt-and-suspenders content-hash skip — catches the edge case
+                # where the converter changed but version didn't (e.g.,
+                # converter upgrade after a clean state). Common path: this is
+                # a no-op because we already gated on version.
                 body_hash = content_hash(conv.markdown)
                 if state.should_skip(pid, version_no, body_hash):
                     summary.pages_skipped += 1
@@ -351,7 +424,7 @@ class ConfluencePuller:
 
                 # Resolve ancestors → folder path
                 ancestor_path = self._resolve_ancestor_path(
-                    page=page,
+                    page=page_meta,
                     title_cache=title_cache,
                 )
 
@@ -381,8 +454,18 @@ class ConfluencePuller:
                 missing_refs = verify_attachment_references(conv.markdown, attachments_root)
                 conv.warnings.extend(missing_refs)
 
-                # Build frontmatter
-                labels = self.get_page_labels(pid)
+                # attachment_count reflects what we have on disk (per ADR-0006
+                # / G1 decision: filesystem truth, not upstream truth).
+                attachment_count = 0
+                if manifest is not None:
+                    attachment_count = len(manifest.files)
+                else:
+                    attach_dir = attachments_root / pid
+                    if attach_dir.exists():
+                        attachment_count = sum(1 for f in attach_dir.iterdir() if f.is_file())
+
+                # Versions → contributors (kept as a separate call; include-labels
+                # only folds labels, not versions)
                 versions = self.get_page_versions(pid)
                 contributors = sorted({v.get("authorId") or v.get("authorAccountId") or "" for v in versions if v})
                 contributors = [c for c in contributors if c]
@@ -401,6 +484,23 @@ class ConfluencePuller:
                     contributors=contributors,
                     labels=labels,
                     aliases=[],
+                    attachment_count=attachment_count,
+                    # visibility/restriction defaults from dataclass (V1 best-effort;
+                    # see ADR-0006). We don't actively call /restriction/byOperation.
+                )
+
+                # Find any existing file for this page-id ANYWHERE under the
+                # space root — survives Confluence title/ancestor renames so
+                # classifier-owned fields (audience, doc_type, tools, topics,
+                # tags_normalized, classifier) are preserved across re-syncs
+                # even when the canonical path changes.
+                filename = canonical_filename(pid, title)
+                target_path = target_dir / filename
+                existing_path = find_existing_page_file(space_root, pid)
+                existing_fm = (
+                    read_existing_frontmatter(existing_path)
+                    if existing_path is not None
+                    else None
                 )
 
                 status_for_fm = "warning" if conv.warnings else "ok"
@@ -409,15 +509,33 @@ class ConfluencePuller:
                     body_markdown=conv.markdown,
                     last_sync_status=status_for_fm,
                     warnings=conv.warnings,
+                    existing_frontmatter=existing_fm,
                 )
                 missing = validate(fm)
                 if missing:
                     raise ValueError(f"Missing required frontmatter fields: {missing}")
 
-                # Write file
-                filename = canonical_filename(pid, title)
-                target_path = target_dir / filename
+                # Write file at the new canonical path
                 target_path.write_text(serialize(fm) + "\n" + conv.markdown, encoding="utf-8")
+
+                # Clean up the orphan if the page was renamed/moved in
+                # Confluence — otherwise the corpus accumulates stale duplicates
+                # keyed by old paths. If cleanup fails (e.g., file lock on
+                # Windows), escalate the page's status to "warning" and
+                # rewrite the frontmatter so the on-disk record matches the
+                # state record and the emitted event.
+                cleanup_warning = _attempt_orphan_cleanup(existing_path, target_path)
+                if cleanup_warning:
+                    conv.warnings.append(cleanup_warning)
+                    status_for_fm = "warning"
+                    fm = build_frontmatter(
+                        meta=meta,
+                        body_markdown=conv.markdown,
+                        last_sync_status=status_for_fm,
+                        warnings=conv.warnings,
+                        existing_frontmatter=existing_fm,
+                    )
+                    target_path.write_text(serialize(fm) + "\n" + conv.markdown, encoding="utf-8")
 
                 # Record state
                 state.record(pid, version_no, content_hash(conv.markdown), _now_iso(), status_for_fm)
@@ -440,7 +558,7 @@ class ConfluencePuller:
                     "output_path": str(target_path),
                     "ancestor_path": ancestor_path,
                     "labels": labels,
-                    "attachment_count": len(manifest.files) if manifest else 0,
+                    "attachment_count": attachment_count,
                 })
 
             except Exception as e:
@@ -508,6 +626,50 @@ def _build_source_url(space_key: str, page_id: str, title: str) -> str:
 
 def _has_attachment_refs(body: str) -> bool:
     return ("ri:attachment" in body) or ("ac:image" in body)
+
+
+def _attempt_orphan_cleanup(existing_path: Path | None, target_path: Path) -> str | None:
+    """Delete `existing_path` if it differs from `target_path`.
+
+    Returns None on success (or no-op when there's nothing to clean). Returns
+    a warning string on OSError so the caller can escalate the page's status
+    to "warning" and rewrite its frontmatter to reflect the failure honestly
+    (otherwise the corpus and the per-page status would disagree).
+    """
+    if existing_path is None:
+        return None
+    try:
+        if existing_path.resolve() == target_path.resolve():
+            return None
+    except OSError:
+        # If resolve() itself fails (e.g., symlink loop, permission), skip the
+        # cleanup attempt and report the failure.
+        return f"orphan cleanup failed for {existing_path}: resolve error"
+    try:
+        existing_path.unlink()
+        return None
+    except OSError as e:
+        return f"orphan cleanup failed for {existing_path}: {e}"
+
+
+def _extract_storage_body(page_response: dict[str, Any]) -> str:
+    """Pull the storage-format body string out of a v2 page response.
+
+    Distinguishes "API anomaly" from "legitimately empty page":
+    - Missing `body`, missing `body.storage`, or missing `body.storage.value`
+      key → ValueError (anomaly; let the caller dead-letter the page).
+    - `body.storage.value == ""` → returns "" (legitimately empty page;
+      caller's strictness boundary will treat this as an empty markdown body
+      and not flag it as a conversion error since the source was empty too).
+    """
+    body_obj = page_response.get("body")
+    if not isinstance(body_obj, dict) or "storage" not in body_obj:
+        raise ValueError("API response missing body.storage")
+    storage_obj = body_obj["storage"]
+    if not isinstance(storage_obj, dict) or "value" not in storage_obj:
+        raise ValueError("API response missing body.storage.value")
+    value = storage_obj.get("value")
+    return value if isinstance(value, str) else ""
 
 
 def _write_space_manifest(
