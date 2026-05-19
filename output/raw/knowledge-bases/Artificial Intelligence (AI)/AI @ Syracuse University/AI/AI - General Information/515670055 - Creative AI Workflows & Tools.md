@@ -3,6 +3,9 @@ page_id: '515670055'
 title: Creative AI Workflows & Tools
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/515670055/Creative+AI+Workflows+&+Tools
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +21,20 @@ contributors:
 - 712020:cb17b376-03f7-4684-86e2-12021700639f
 contributors_count: 2
 content_hash: sha256:ca5770166161e4603a715e0ccc4fd1c1fbdc7401199c742cc96f671326a35b0d
-synced_at: '2026-05-13T16:55:33Z'
+synced_at: '2026-05-19T15:03:38Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 195
+days_since_modified: 200
 maintenance_signal: aging
+word_count: 970
+char_count: 5842
+token_estimate: 1670
+attachment_count: 0
 conversion_warnings: []
 ---
 

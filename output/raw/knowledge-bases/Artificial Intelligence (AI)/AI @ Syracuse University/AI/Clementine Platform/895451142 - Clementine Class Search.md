@@ -3,6 +3,9 @@ page_id: '895451142'
 title: Clementine Class Search
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/895451142/Clementine+Class+Search
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +21,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:17206e8a60ce8dd1d6873b12453ee99b4b05627689f46a6777edad60dc234f81
-synced_at: '2026-05-13T16:56:18Z'
+synced_at: '2026-05-19T15:04:24Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 41
+days_since_modified: 47
 maintenance_signal: fresh
+word_count: 731
+char_count: 5280
+token_estimate: 1509
+attachment_count: 0
 conversion_warnings: []
 ---
 

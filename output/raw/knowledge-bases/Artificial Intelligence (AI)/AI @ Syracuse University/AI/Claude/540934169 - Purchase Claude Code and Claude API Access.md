@@ -3,6 +3,9 @@ page_id: '540934169'
 title: Purchase Claude Code and Claude API Access
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/540934169/Purchase+Claude+Code+and+Claude+API+Access
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +21,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:ab7245c2b31b84102eaac291cd76b0caeb6b7f08f635b7cd1a9c1cd898541e53
-synced_at: '2026-05-13T16:55:50Z'
+synced_at: '2026-05-19T15:03:56Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 28
+days_since_modified: 34
 maintenance_signal: fresh
+word_count: 809
+char_count: 5347
+token_estimate: 1528
+attachment_count: 2
 conversion_warnings: []
 ---
 

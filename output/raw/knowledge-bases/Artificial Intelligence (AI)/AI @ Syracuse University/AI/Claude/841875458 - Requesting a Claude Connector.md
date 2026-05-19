@@ -3,6 +3,9 @@ page_id: '841875458'
 title: Requesting a Claude Connector
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/841875458/Requesting+a+Claude+Connector
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +20,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 1
 content_hash: sha256:d7e9041ecf8ce2e35ae52c69f9ac0ff66da998a367aa0ab1475da476feb23a7b
-synced_at: '2026-05-13T16:56:17Z'
+synced_at: '2026-05-19T15:04:23Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 78
+days_since_modified: 84
 maintenance_signal: fresh
+word_count: 676
+char_count: 4356
+token_estimate: 1245
+attachment_count: 0
 conversion_warnings: []
 ---
 

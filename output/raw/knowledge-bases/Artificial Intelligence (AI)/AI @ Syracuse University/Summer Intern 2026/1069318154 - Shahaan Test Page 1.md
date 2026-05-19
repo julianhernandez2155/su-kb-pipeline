@@ -3,6 +3,9 @@ page_id: '1069318154'
 title: Shahaan Test Page 1
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/1069318154/Shahaan+Test+Page+1
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -16,15 +19,20 @@ contributors:
 - 712020:179df75c-ede5-4e25-9d40-b6522da1894e
 contributors_count: 1
 content_hash: sha256:e37630029901432fe6f05624962e0a73e53039f06daeadb2f62fc4b7646c473a
-synced_at: '2026-05-13T16:56:27Z'
+synced_at: '2026-05-19T15:04:33Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 1
+days_since_modified: 7
 maintenance_signal: fresh
+word_count: 56
+char_count: 335
+token_estimate: 96
+attachment_count: 0
 conversion_warnings: []
 ---
 

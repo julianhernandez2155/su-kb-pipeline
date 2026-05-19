@@ -3,6 +3,9 @@ page_id: '534642749'
 title: Claude Enterprise at Syracuse University
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/534642749/Claude+Enterprise+at+Syracuse+University
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +20,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 1
 content_hash: sha256:7acc18944a6a7b284227b09d671cdb756e8836f845fb5b25edaaea0d8dec62c8
-synced_at: '2026-05-13T16:55:45Z'
+synced_at: '2026-05-19T15:03:50Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 194
+days_since_modified: 200
 maintenance_signal: aging
+word_count: 431
+char_count: 2962
+token_estimate: 847
+attachment_count: 0
 conversion_warnings: []
 ---
 

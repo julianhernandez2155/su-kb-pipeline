@@ -3,6 +3,9 @@ page_id: '1069350926'
 title: Rob's Test Page
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/1069350926/Rob's+Test+Page
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -16,15 +19,20 @@ contributors:
 - 712020:118b2a32-7a0e-48f0-b209-f03466cf51e3
 contributors_count: 1
 content_hash: sha256:1fe62c368e76a18bfbbb3e892e6be31f0b5ae08c0131b609b250394f84833a8e
-synced_at: '2026-05-13T16:56:28Z'
+synced_at: '2026-05-19T15:04:34Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 0
+days_since_modified: 6
 maintenance_signal: fresh
+word_count: 8
+char_count: 40
+token_estimate: 12
+attachment_count: 0
 conversion_warnings: []
 ---
 

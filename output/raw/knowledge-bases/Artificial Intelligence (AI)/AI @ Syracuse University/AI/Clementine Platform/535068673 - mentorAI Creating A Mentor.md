@@ -3,6 +3,9 @@ page_id: '535068673'
 title: mentorAI Creating A Mentor
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,16 +20,22 @@ contributors:
 - 712020:cb17b376-03f7-4684-86e2-12021700639f
 contributors_count: 1
 content_hash: sha256:ba16a11e6e1dc3fc645cc01ad88b81e6347088293409fb2e8f4bbcedb7543b94
-synced_at: '2026-05-13T16:55:48Z'
+synced_at: '2026-05-19T15:03:53Z'
 last_sync_status: ok
 labels:
+- kb-how-to-article
+tags_original:
 - kb-how-to-article
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 182
+days_since_modified: 188
 maintenance_signal: aging
+word_count: 378
+char_count: 2877
+token_estimate: 822
+attachment_count: 3
 conversion_warnings: []
 ---
 

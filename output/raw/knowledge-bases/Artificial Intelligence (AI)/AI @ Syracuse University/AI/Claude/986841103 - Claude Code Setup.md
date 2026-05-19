@@ -3,6 +3,9 @@ page_id: '986841103'
 title: Claude Code Setup
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +20,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 1
 content_hash: sha256:b27e7a6f07f056fa8c90da7879f8ebe5671072c0a0eb3d045c577fe1bd445d67
-synced_at: '2026-05-13T16:56:22Z'
+synced_at: '2026-05-19T15:04:28Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 28
+days_since_modified: 33
 maintenance_signal: fresh
+word_count: 988
+char_count: 6667
+token_estimate: 1905
+attachment_count: 1
 conversion_warnings: []
 ---
 

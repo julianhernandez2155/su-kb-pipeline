@@ -3,6 +3,9 @@ page_id: '522289260'
 title: Copilot – Frequently Asked Questions
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522289260/Copilot+–+Frequently+Asked+Questions
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -19,15 +22,20 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 3
 content_hash: sha256:2e33c4cd4014ce5e782d56c0d6081d927e6f1cd220ab4db9bf3d1d3c562278bc
-synced_at: '2026-05-13T16:55:40Z'
+synced_at: '2026-05-19T15:03:46Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 195
+days_since_modified: 200
 maintenance_signal: aging
+word_count: 399
+char_count: 2938
+token_estimate: 840
+attachment_count: 0
 conversion_warnings: []
 ---
 

@@ -3,6 +3,9 @@ page_id: '511246346'
 title: Claude Career Project
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511246346/Claude+Career+Project
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +21,20 @@ contributors:
 - 712020:42fe56d5-9777-4ca3-91c0-648e65b715bc
 contributors_count: 1
 content_hash: sha256:3d3b8d50bacfcabcf8d7a57641ff818fd5088418b45aaf7e7d83d92e33abe18e
-synced_at: '2026-05-13T16:55:29Z'
+synced_at: '2026-05-19T15:03:34Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 203
+days_since_modified: 209
 maintenance_signal: aging
+word_count: 65
+char_count: 628
+token_estimate: 180
+attachment_count: 4
 conversion_warnings: []
 ---
 

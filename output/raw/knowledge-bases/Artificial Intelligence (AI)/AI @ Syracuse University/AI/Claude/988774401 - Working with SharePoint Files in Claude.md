@@ -3,6 +3,9 @@ page_id: '988774401'
 title: Working with SharePoint Files in Claude
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/988774401/Working+with+SharePoint+Files+in+Claude
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +20,20 @@ contributors:
 - 712020:80f8cb27-5c7e-4ff8-ae31-4211dd953797
 contributors_count: 1
 content_hash: sha256:d6d9c8d443ca38177835fd02b62c2755c87247f648cd396ee5f7c11d312161a1
-synced_at: '2026-05-13T16:56:25Z'
+synced_at: '2026-05-19T15:04:30Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 27
+days_since_modified: 33
 maintenance_signal: fresh
+word_count: 390
+char_count: 2441
+token_estimate: 698
+attachment_count: 3
 conversion_warnings: []
 ---
 

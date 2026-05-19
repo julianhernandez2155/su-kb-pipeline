@@ -3,6 +3,9 @@ page_id: '483525103'
 title: AI @ Syracuse University
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/483525103/AI+@+Syracuse+University
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -15,15 +18,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:0c81244e55ed915fe51f83569f736add42a887fd8412d1e073555578bbf1e4ac
-synced_at: '2026-05-13T16:55:19Z'
+synced_at: '2026-05-19T15:03:24Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 54
+days_since_modified: 60
 maintenance_signal: fresh
+word_count: 264
+char_count: 2435
+token_estimate: 696
+attachment_count: 8
 conversion_warnings: []
 ---
 

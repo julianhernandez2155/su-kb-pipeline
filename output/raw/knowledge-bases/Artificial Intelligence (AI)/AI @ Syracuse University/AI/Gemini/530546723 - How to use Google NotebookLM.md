@@ -3,6 +3,9 @@ page_id: '530546723'
 title: How to use Google NotebookLM
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/530546723/How+to+use+Google+NotebookLM
+visibility_signal: accessible_to_sync_user
+restriction_check: not_checked
+restricted_to: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,16 +20,22 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 1
 content_hash: sha256:7b146a0f694a02543277671da46493a617ee27d6e00456487990cc94904998a5
-synced_at: '2026-05-13T16:55:44Z'
+synced_at: '2026-05-19T15:03:49Z'
 last_sync_status: ok
 labels:
+- kb-how-to-article
+tags_original:
 - kb-how-to-article
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 200
+days_since_modified: 206
 maintenance_signal: aging
+word_count: 1275
+char_count: 8320
+token_estimate: 2378
+attachment_count: 4
 conversion_warnings: []
 ---
 
