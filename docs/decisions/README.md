@@ -15,6 +15,7 @@ This directory holds ADRs (Architecture Decision Records) for `su-kb-pipeline` i
 | [0007](0007-access-classification-v1.md) | Access classification v1 — direct + ancestor + space layers | accepted | 2026-05-19 |
 | [0008](0008-space-classifier-tightening.md) | Space classifier: positive-ID via role:ANONYMOUS + allowlist fallback | accepted | 2026-05-20 |
 | [0009](0009-mcp-read-path-filter.md) | MCP read-path filter: load-time gate in the corpus loader | accepted | 2026-05-20 |
+| [0010](0010-trust-zones-admin-vs-mcp.md) | Trust zones: admin web UI vs user-facing MCP retrieval | accepted | 2026-05-21 |
 
 ## Adding a new ADR
 

@@ -466,8 +466,19 @@ async def post_query_stream(body: dict[str, Any]):
 def _run_chat_stream(question: str, mode: str, config: SyncConfig, emit) -> None:
     """Stream a single-shot ceiling/baseline answer using the Anthropic SDK's
     streaming surface. Emits context_loaded, text_delta..., then done."""
+    # Mirror answer_query's access-aware load (ADR-0009): compute the public
+    # allowlist from filtered raw pages, then pass it into load_wiki_corpus
+    # so hubs whose `synthesizes` references a restricted page are dropped.
+    # Without this, the streaming raw+wiki path could include a hub whose
+    # body paraphrases / cites a restricted source.
     raw_pages = query_mod.load_raw_corpus(config)
-    wiki_pages = query_mod.load_wiki_corpus(config) if mode == "raw+wiki" else []
+    allowed_raw_ids = {p.page_id for p in raw_pages}
+    all_pages = query_mod.load_raw_corpus(config, include_restricted=True)
+    restricted_page_ids = {p.page_id for p in all_pages if p.page_id not in allowed_raw_ids}
+    wiki_pages = (
+        query_mod.load_wiki_corpus(config, allowed_raw_ids=allowed_raw_ids)
+        if mode == "raw+wiki" else []
+    )
     orientation = query_mod.load_orientation_files(config) if mode == "raw+wiki" else []
     effective_mode = "raw+wiki" if (mode == "raw+wiki" and wiki_pages) else "raw"
 
@@ -500,7 +511,9 @@ def _run_chat_stream(question: str, mode: str, config: SyncConfig, emit) -> None
         emit("error", {"message": str(e)})
         return
 
-    citations = query_mod.extract_citations(full_answer, raw_pages)
+    citations = query_mod.extract_citations(
+        full_answer, raw_pages, restricted_page_ids=restricted_page_ids
+    )
     cost = query_mod.estimate_cost_usd(usage)
     latency_ms = int((_now_perf() - t0) * 1000)
     emit("done", {
@@ -557,7 +570,14 @@ def _run_agentic_stream(question: str, config: SyncConfig, emit) -> None:
         # 'done' event with resolved citations so the UI doesn't have to
         # round-trip through the corpus index.
         if name == "done":
-            citations = query_mod.extract_citations(full_answer, tools.raw_pages)
+            # Pass restricted IDs so a hallucinated [[<restricted-id>]] citation
+            # surfaces as `(restricted — not available)` for the operator
+            # signal in the UI citation panel — ADR-0009 parity with
+            # answer_query / the non-streaming path.
+            citations = query_mod.extract_citations(
+                full_answer, tools.raw_pages,
+                restricted_page_ids=tools._restricted_raw_ids,
+            )
             data = dict(data)
             data["citations"] = citations
             data["context_used"] = {
