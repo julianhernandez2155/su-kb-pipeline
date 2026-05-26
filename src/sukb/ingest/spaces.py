@@ -33,7 +33,7 @@ from typing import Any
 import httpx
 
 
-# default_audience vocabulary (per phase-1.1-plan-2026-05-19.md §"Space cache"):
+# default_audience vocabulary (per docs/archive/phase-1.1-plan-2026-05-19.md §"Space cache"):
 #   su_community     — endpoint responded, space is open to general SU audience
 #   restricted_space — endpoint responded, space is locked to a narrow allowlist
 #   anonymous        — endpoint responded, space is world-readable (unlikely at SU)

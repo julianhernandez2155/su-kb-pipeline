@@ -1,6 +1,6 @@
 """Phase 1.1 — read-only access classification probe.
 
-See docs/phase-1.1-plan-2026-05-19.md for the full plan. This script is
+See docs/archive/phase-1.1-plan-2026-05-19.md for the full plan. This script is
 standalone (not part of the puller) so the human can validate API response
 shapes before any frontmatter rewrites or pipeline integration happen.
 

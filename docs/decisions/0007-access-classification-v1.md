@@ -20,8 +20,8 @@ Phase 1.1 needs to:
 4. Stop short of per-user RBAC — that's a separate, post-OAuth project.
 5. Be reversible without re-ingesting bodies — frontmatter rewrite only.
 
-Planning doc: [docs/phase-1.1-plan-2026-05-19.md](../phase-1.1-plan-2026-05-19.md).
-Predecessor: [docs/access-metadata-plan-2026-05-19.md](../access-metadata-plan-2026-05-19.md).
+Planning doc: [docs/archive/phase-1.1-plan-2026-05-19.md](../archive/phase-1.1-plan-2026-05-19.md).
+Predecessor: [docs/archive/access-metadata-plan-2026-05-19.md](../archive/access-metadata-plan-2026-05-19.md).
 
 ## Decision
 
@@ -150,8 +150,8 @@ Verified by grep against the generated `access-summary.md` post-write: no `accou
 
 ## References
 
-- Predecessor planning doc: [docs/phase-1.1-plan-2026-05-19.md](../phase-1.1-plan-2026-05-19.md)
-- API-shape probe doc: [docs/access-metadata-plan-2026-05-19.md](../access-metadata-plan-2026-05-19.md)
+- Predecessor planning doc: [docs/archive/phase-1.1-plan-2026-05-19.md](../archive/phase-1.1-plan-2026-05-19.md)
+- API-shape probe doc: [docs/archive/access-metadata-plan-2026-05-19.md](../archive/access-metadata-plan-2026-05-19.md)
 - Generated artifacts (probe outputs): [../../output/\_access/access-summary.md](../../output/_access/access-summary.md)
 - Shared helpers: [src/sukb/ingest/restrictions.py](../../src/sukb/ingest/restrictions.py), [src/sukb/ingest/spaces.py](../../src/sukb/ingest/spaces.py)
 - Probe script: [scripts/access\_metadata\_probe.py](../../scripts/access_metadata_probe.py)

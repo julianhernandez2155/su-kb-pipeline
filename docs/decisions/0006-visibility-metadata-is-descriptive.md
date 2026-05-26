@@ -53,8 +53,8 @@ Concrete consequences for V1:
 
 ## References
 
-- G0 / G1 design for Phase 1: [docs/phase-1-design-2026-05-19.md](../phase-1-design-2026-05-19.md)
-- Aaron's restriction question + V1 public-only agreement: [docs/aaron-meeting-2026-05-18-followups.md](../aaron-meeting-2026-05-18-followups.md) §F-01
+- G0 / G1 design for Phase 1: [docs/archive/phase-1-design-2026-05-19.md](../archive/phase-1-design-2026-05-19.md)
+- Aaron's restriction question + V1 public-only agreement: [docs/archive/aaron-meeting-2026-05-18-followups.md](../archive/aaron-meeting-2026-05-18-followups.md) §F-01
 - Atlassian REST v2 page API: <https://developer.atlassian.com/cloud/confluence/rest/v2/api-group-page/>
 - Atlassian content restrictions API: <https://developer.atlassian.com/cloud/confluence/rest/v1/api-group-content-restrictions/>
 - Atlassian support note on inherited restrictions: <https://support.atlassian.com/confluence/kb/confluence-get-page-restrictions-api-doesnt-display-inherited-restrictions/>

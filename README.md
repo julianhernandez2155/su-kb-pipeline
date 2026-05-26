@@ -110,21 +110,25 @@ su-kb-pipeline/
 │   ├── run_eval.py            # eval set runner (reads docs/eval-queries.yaml)
 │   ├── run_proposals.py       # Karpathy-style hub proposal pass
 │   └── draft_hubs.py          # LLM-drafted hub generator
-├── tests/                     # 110 tests; mirrors src/sukb structure
-│   ├── ingest/, chat/, fixtures/
+├── tests/                     # 257 tests; mirrors src/sukb structure
+│   ├── ingest/, chat/, web/, fixtures/
 │   └── conftest.py
-├── docs/                      # research artifacts
-│   ├── v1-tool-brief.md
+├── docs/                      # decision log + active planning
+│   ├── STATUS.md              # living one-page snapshot (read first)
+│   ├── decisions/             # ADRs (0001–0010, MADR format)
+│   ├── log/                   # append-only session entries (YYYY-MM-DD.md)
+│   ├── archive/               # historical planning docs (superseded by ADRs)
+│   ├── next-phase-plan-v2.md  # active Step 6/7/8 plan
+│   ├── v1-tool-brief.md       # Aaron-facing v1 design brief
 │   ├── wiki-operating-model.md
 │   ├── eval-baseline-2026-05-13.md
-│   ├── eval-queries.yaml
-│   ├── wiki-proposals-2026-05-13.md
-│   └── next-phase-plan-v2.md
+│   └── eval-queries.yaml
 └── output/                    # LAYER 2 (the corpus)
     ├── CLAUDE.md              # agent rules for working with output/
     ├── index.md               # global corpus map
     ├── raw/                   # immutable Confluence mirror
     ├── wiki/                  # 2 reviewed synthesis hubs + index
+    ├── _access/               # access-classification artifacts (Phase 1.1)
     ├── attachments/           # referenced binaries
     ├── conversion-failures/   # dead-letter pages (empty in clean state)
     └── query-sessions/        # eval-run transcripts (gitignored)

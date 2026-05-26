@@ -83,7 +83,7 @@ The citation case is the one user-visible distinction — and it's a citation in
 
 ## References
 
-- Plan: [docs/phase-1.1-plan-2026-05-19.md](../phase-1.1-plan-2026-05-19.md) §"Step 3 — MCP / indexer enforcement"
+- Plan: [docs/archive/phase-1.1-plan-2026-05-19.md](../archive/phase-1.1-plan-2026-05-19.md) §"Step 3 — MCP / indexer enforcement"
 - Predecessors: [ADR-0007](0007-access-classification-v1.md), [ADR-0008](0008-space-classifier-tightening.md)
 - Code:
   - [src/sukb/chat/query.py](../../src/sukb/chat/query.py) — `load_raw_corpus`, `load_wiki_corpus`, `extract_citations`
