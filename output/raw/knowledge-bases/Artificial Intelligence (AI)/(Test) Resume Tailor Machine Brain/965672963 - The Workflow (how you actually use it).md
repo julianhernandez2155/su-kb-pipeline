@@ -3,9 +3,12 @@ page_id: '965672963'
 title: The Workflow (how you actually use it)
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/965672963/The+Workflow+(how+you+actually+use+it)
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,7 +21,7 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 1
 content_hash: sha256:0f87609196f35a967ad2a54fcf205802055af55d02f633462bb7192284ea372c
-synced_at: '2026-05-19T15:04:26Z'
+synced_at: '2026-05-20T14:49:59Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -26,7 +29,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 43
+days_since_modified: 44
 maintenance_signal: fresh
 word_count: 630
 char_count: 3736

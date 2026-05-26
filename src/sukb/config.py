@@ -22,6 +22,11 @@ class SyncConfig:
     api_base: str
     rate_limit_per_sec: float
     inventory_path: Path
+    # Phase 1.1 access classification: spaces operator-declared as broadly
+    # accessible to the SU community. Override the space-permissions
+    # positive-ID heuristic. Use sparingly; positive-ID (role:ANONYMOUS
+    # read/space marker) handles the standard SU pattern.
+    broadly_accessible_spaces: list[str] = field(default_factory=list)
     raw_path: Path = field(init=False)
     config_path: Path = field(init=False)
 
@@ -46,6 +51,7 @@ class SyncConfig:
             api_base=data.get("api_base", "https://su-jsm.atlassian.net/wiki/api/v2"),
             rate_limit_per_sec=float(data.get("rate_limit_per_sec", 5)),
             inventory_path=inventory_path,
+            broadly_accessible_spaces=list(data.get("broadly_accessible_spaces", [])),
         )
         cfg.raw_path = output_dir / "raw"
         cfg.config_path = config_path

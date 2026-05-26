@@ -3,9 +3,12 @@ page_id: '500236296'
 title: Meeting Summaries with Claude
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/500236296/Meeting+Summaries+with+Claude
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -23,7 +26,7 @@ contributors:
 - 712020:cb17b376-03f7-4684-86e2-12021700639f
 contributors_count: 3
 content_hash: sha256:9f0d7d907ec2fc8e335484d992e5803a733dcfc14a7ee8f56d56394a68e45aef
-synced_at: '2026-05-19T15:03:31Z'
+synced_at: '2026-05-20T14:48:44Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -31,7 +34,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 115
+days_since_modified: 116
 maintenance_signal: aging
 word_count: 815
 char_count: 5306

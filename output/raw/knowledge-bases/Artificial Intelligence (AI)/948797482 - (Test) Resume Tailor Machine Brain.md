@@ -3,9 +3,12 @@ page_id: '948797482'
 title: (Test) Resume Tailor Machine Brain
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/948797482/(Test)+Resume+Tailor+Machine+Brain
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,7 +20,7 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 1
 content_hash: sha256:b8be205039d48a1e1aa2df4afee1ad6c356fb14abda5b01be32f5c066d844c9e
-synced_at: '2026-05-19T15:04:25Z'
+synced_at: '2026-05-20T14:49:57Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -25,7 +28,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 43
+days_since_modified: 44
 maintenance_signal: fresh
 word_count: 6660
 char_count: 45123

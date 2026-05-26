@@ -3,9 +3,12 @@ page_id: '515801118'
 title: Smart Study Companion with Gemini
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/515801118/Smart+Study+Companion+with+Gemini
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -21,7 +24,7 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 2
 content_hash: sha256:1c91e83c176c6ad4fb5a0b8df0b3441ffb962ce58eecb4ffa5b9a760945383b8
-synced_at: '2026-05-19T15:03:40Z'
+synced_at: '2026-05-20T14:48:55Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -29,7 +32,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 200
+days_since_modified: 201
 maintenance_signal: aging
 word_count: 835
 char_count: 5265

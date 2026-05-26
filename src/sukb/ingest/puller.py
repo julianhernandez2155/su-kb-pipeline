@@ -18,12 +18,22 @@ from typing import Any, Iterator
 
 import httpx
 
+from .access import (
+    AncestorRestrictionCache,
+    PageClassification,
+    classification_to_manifest_entry,
+    classify_visibility,
+    now_iso as access_now_iso,
+    rewrite_access_fields,
+    space_to_jsonable,
+)
 from .adf import page_uses_adf
 from .attachments import download_attachments, verify_attachment_references
 from ..config import SyncConfig
 from .converter import convert_page
 from .dead_letter import write_failure
 from .frontmatter import (
+    ACCESS_OWNED_FIELDS,
     PageMeta,
     build_frontmatter,
     canonical_filename,
@@ -34,6 +44,8 @@ from .frontmatter import (
     serialize,
     validate,
 )
+from .restrictions import fetch_direct_restrictions, v1_rest_base_from_v2
+from .spaces import SpaceAudience, fetch_space_audience
 from .state import SyncState
 from .wikilinks import CorpusIndex, DefaultLinkResolver
 
@@ -81,6 +93,9 @@ class ConfluencePuller:
         # pages. Cache aggressively so a 34-page pull doesn't make 34× redundant
         # ancestor-detail calls.
         self._ancestor_title_cache: dict[str, str] = {}
+        # Per-sync account-id for the authenticated principal. Lazy-resolved
+        # on first access classification call (see _resolve_account_id).
+        self._account_id: str | None = None
         # Spec §4.1 recommends the Atlassian gateway URL over the custom domain
         # — *and* it's mandatory for attachment downloads, which return 401
         # against `su-jsm.atlassian.net/wiki/download/...` but 302-redirect
@@ -306,6 +321,74 @@ class ConfluencePuller:
             for c in data.get("results", [])
         ]
 
+    # --- access classification (Phase 1.1 Step 2, ADR-0007) -------------------
+
+    def _resolve_account_id(self) -> str:
+        """Fetch the authenticated principal's accountId (lazy, once per sync)."""
+        if self._account_id is not None:
+            return self._account_id
+        url = v1_rest_base_from_v2(self.api_base) + "/user/current"
+        try:
+            data = self._get(url)
+            self._account_id = str(data.get("accountId") or "")
+        except httpx.HTTPError:
+            self._account_id = ""
+        return self._account_id
+
+    def classify_page_access(
+        self,
+        page: dict[str, Any],
+        space: SpaceAudience | None,
+        ancestor_cache: AncestorRestrictionCache,
+        page_title_cache: dict[str, str],
+    ) -> PageClassification:
+        """Build a PageClassification for one page.
+
+        Walks direct + ancestor restrictions via the shared cache; reuses the
+        puller's `_fetch_node_title` for ancestor name resolution.
+        """
+        pid = str(page.get("id"))
+        title = page.get("title") or ""
+        record = PageClassification(
+            page_id=pid,
+            title=title,
+            space_key=space.key if space else "",
+            checked_at=access_now_iso(),
+            checked_with_account_id=self._resolve_account_id(),
+            space=space,
+        )
+
+        record.direct = fetch_direct_restrictions(self, pid, "page", title)
+
+        try:
+            ancestor_nodes = self.get_page_ancestors(pid)
+        except httpx.HTTPError as e:
+            record.errors.append(f"ancestor walk failed: {e}")
+            record.ancestors = []
+            sig, layers, sources = classify_visibility(record.direct, None, space)
+            record.visibility_signal = sig
+            record.restriction_check = layers
+            record.restriction_source_ids = sources
+            return record
+
+        ancestors: list[Any] = []
+        for node in ancestor_nodes:
+            aid = str(node.get("id") or "")
+            if not aid:
+                continue
+            atype = (node.get("type") or "").lower() or "unknown"
+            atitle = node.get("title") or page_title_cache.get(aid) or ""
+            if not atitle:
+                atitle = self._fetch_node_title(aid, atype) or ""
+            ancestors.append(ancestor_cache.get(aid, atype, atitle))
+        record.ancestors = ancestors
+
+        sig, layers, sources = classify_visibility(record.direct, ancestors, space)
+        record.visibility_signal = sig
+        record.restriction_check = layers
+        record.restriction_source_ids = sources
+        return record
+
     # --- main orchestrator ----------------------------------------------------
 
     def pull_space(self, space_key: str) -> Iterator[PullEvent]:
@@ -333,6 +416,19 @@ class ConfluencePuller:
         meta_root.mkdir(parents=True, exist_ok=True)
         state = SyncState.load(meta_root / ".sync-state.json")
         dead_letter_root = self.config.output_dir / "conversion-failures"
+
+        # Phase 1.1 Step 2 (ADR-0007): classify space audience + open
+        # per-sync caches that the per-page access classifier shares.
+        space_audience = fetch_space_audience(
+            puller=self,
+            space_key=space_key,
+            space_id=space_id,
+            space_name=space_name,
+            homepage_id=str(space.get("homepageId") or ""),
+            broadly_accessible_spaces=list(self.config.broadly_accessible_spaces),
+        )
+        ancestor_restriction_cache = AncestorRestrictionCache(self)
+        access_records: list[PageClassification] = []
 
         # 2. First pass — list pages, build corpus index for wikilink resolution.
         all_pages = list(self.list_pages(space_id))
@@ -362,21 +458,45 @@ class ConfluencePuller:
 
             summary.pages_total += 1
 
+            # Phase 1.1 Step 2 (ADR-0007): classify access first. Direct +
+            # ancestor restrictions are cheap and ancestor-cached; the
+            # result feeds both the manifest (always) and the frontmatter
+            # writer (always — never preserved across re-sync).
+            classification = self.classify_page_access(
+                page=page_meta,
+                space=space_audience,
+                ancestor_cache=ancestor_restriction_cache,
+                page_title_cache=title_cache,
+            )
+            access_records.append(classification)
+
             # Metadata-first short-circuit: if version matches a prior
             # successful sync, skip body fetch + convert entirely. Safe under
             # our deterministic converter — same source version → same output
-            # markdown → same content_hash.
+            # markdown → same content_hash. Access classification still
+            # runs (above) and the on-disk access fields are refreshed via
+            # rewrite_access_fields if they drifted (e.g., a folder
+            # restriction was added or lifted upstream since the last sync).
             if state.should_skip_by_version(pid, version_no):
                 prior = state.pages.get(pid)
-                summary.pages_skipped += 1
-                yield PullEvent("page_skipped", space_key, {
-                    "page_id": pid, "title": title,
-                    "reason": "version unchanged (metadata-first, no body fetch)",
-                })
-                if prior is not None:
-                    state.record(pid, prior.version, prior.content_hash, _now_iso(), "skipped")
-                    state.save()
-                continue
+                ok, err = rewrite_access_fields(self.config.raw_path, classification)
+                if err:
+                    # Couldn't rewrite (file missing, parse error). Don't
+                    # mask it as "skipped" — let the full pipeline run so
+                    # the page gets a clean v3 frontmatter.
+                    pass
+                else:
+                    summary.pages_skipped += 1
+                    yield PullEvent("page_skipped", space_key, {
+                        "page_id": pid, "title": title,
+                        "reason": "version unchanged (metadata-first, no body fetch)",
+                        "access_rewrite": "changed" if ok else "unchanged",
+                        "visibility_signal": classification.visibility_signal,
+                    })
+                    if prior is not None:
+                        state.record(pid, prior.version, prior.content_hash, _now_iso(), "skipped")
+                        state.save()
+                    continue
 
             # Pre-init so the except handler at the end of this loop body can
             # still reference body_storage if get_page_full itself raises.
@@ -485,8 +605,13 @@ class ConfluencePuller:
                     labels=labels,
                     aliases=[],
                     attachment_count=attachment_count,
-                    # visibility/restriction defaults from dataclass (V1 best-effort;
-                    # see ADR-0006). We don't actively call /restriction/byOperation.
+                    # Phase 1.1 Step 2 (ADR-0007): access fields populated
+                    # from the per-page classification computed at the top
+                    # of this loop iteration. ACCESS_OWNED_FIELDS — refreshed
+                    # every sync; never preserved.
+                    visibility_signal=classification.visibility_signal,
+                    restriction_check=list(classification.restriction_check),
+                    restriction_source_ids=list(classification.restriction_source_ids),
                 )
 
                 # Find any existing file for this page-id ANYWHERE under the
@@ -586,6 +711,16 @@ class ConfluencePuller:
         state.save()
         _write_space_manifest(meta_root, space_key, space_id, space_name, space_type, len(all_pages), summary)
 
+        # 5. Write Phase 1.1 access outputs (ADR-0007). Manifest + spaces.json
+        # are gitignored; access-summary.md is committed and sanitized.
+        access_root = self.config.output_dir / "_access"
+        _write_access_outputs(
+            access_root=access_root,
+            space_key=space_key,
+            space_audience=space_audience,
+            records=access_records,
+        )
+
         summary.duration_s = round(time.monotonic() - start, 3)
         yield PullEvent("completed", space_key, {
             "summary": {
@@ -670,6 +805,116 @@ def _extract_storage_body(page_response: dict[str, Any]) -> str:
         raise ValueError("API response missing body.storage.value")
     value = storage_obj.get("value")
     return value if isinstance(value, str) else ""
+
+
+def _write_access_outputs(
+    access_root: Path,
+    space_key: str,
+    space_audience: SpaceAudience,
+    records: list[PageClassification],
+) -> None:
+    """Write the three Phase 1.1 access outputs into output/_access/.
+
+    Per-sync writer for one space's worth of access classifications. When
+    multiple spaces are synced in one process, each call overwrites the
+    manifest/spaces/summary — the puller currently runs one space at a
+    time (sync_config enabled_keys), so this matches actual behavior.
+    """
+    import json
+
+    from collections import Counter
+
+    access_root.mkdir(parents=True, exist_ok=True)
+
+    # Manifest (gitignored).
+    manifest_path = access_root / "access-manifest.jsonl"
+    lines = [
+        json.dumps(classification_to_manifest_entry(r), ensure_ascii=False)
+        for r in records
+    ]
+    _atomic_write(manifest_path, "\n".join(lines) + "\n" if lines else "")
+
+    # spaces.json (gitignored). Holds the full paginated raw per space.
+    spaces_payload = {
+        space_key: space_to_jsonable(space_audience, include_raw=True),
+    }
+    spaces_path = access_root / "spaces.json"
+    _atomic_write(spaces_path, json.dumps(spaces_payload, indent=2, ensure_ascii=False) + "\n")
+
+    # access-summary.md (committed; sanitized per ADR-0007).
+    sig_counts = Counter(r.visibility_signal for r in records)
+    layer_counts = Counter(",".join(r.restriction_check) or "(none)" for r in records)
+    source_to_count: Counter[str] = Counter()
+    source_to_title: dict[str, str] = {}
+    for r in records:
+        for sid in r.restriction_source_ids:
+            source_to_count[sid] += 1
+            if sid == r.page_id:
+                continue  # skip — would leak a restricted page title
+            for a in r.ancestors:
+                if str(a.entity_id) == sid and a.entity_title:
+                    source_to_title.setdefault(sid, a.entity_title)
+                    break
+
+    visibility_values = (
+        "no_read_restrictions_seen",
+        "restricted_direct",
+        "restricted_inherited",
+        "space_restricted",
+        "unknown",
+    )
+
+    body_lines: list[str] = []
+    body_lines.append("# Access Classification Summary")
+    body_lines.append("")
+    body_lines.append(f"_Generated: {_now_iso()}_")
+    body_lines.append("")
+    body_lines.append("Auto-generated by `src/sukb/ingest/puller.py`. Do not edit. Sanitized per ADR-0007.")
+    body_lines.append("")
+    body_lines.append(f"Space: {space_key}  (audience: {space_audience.default_audience})")
+    body_lines.append(f"Pages classified: {len(records)}")
+    body_lines.append("")
+    body_lines.append("## Visibility breakdown")
+    body_lines.append("")
+    body_lines.append("| visibility_signal | count |")
+    body_lines.append("|---|---:|")
+    for sig in visibility_values:
+        body_lines.append(f"| {sig} | {sig_counts.get(sig, 0)} |")
+    body_lines.append("")
+    body_lines.append("## Layers checked")
+    body_lines.append("")
+    body_lines.append("| restriction_check | count |")
+    body_lines.append("|---|---:|")
+    for layers, count in sorted(layer_counts.items()):
+        body_lines.append(f"| {layers} | {count} |")
+    body_lines.append("")
+    body_lines.append("## Restriction sources (folders that gate access)")
+    body_lines.append("")
+    body_lines.append("Each row is a folder/page node whose direct restrictions caused descendant pages to be excluded. Restricted *destination* page titles are NOT surfaced.")
+    body_lines.append("")
+    body_lines.append("| source_id | source_title | pages_gated |")
+    body_lines.append("|---|---|---:|")
+    for sid, count in source_to_count.most_common():
+        title = source_to_title.get(sid, "(unnamed)")
+        body_lines.append(f"| {sid} | {title} | {count} |")
+    if not source_to_count:
+        body_lines.append("| _(none)_ | | |")
+    body_lines.append("")
+    body_lines.append("## Errors / unknowns")
+    body_lines.append("")
+    body_lines.append(f"Pages classified as `unknown`: {sig_counts.get('unknown', 0)}")
+    body_lines.append(f"Pages with manifest-level errors: {sum(1 for r in records if r.errors)}")
+    body_lines.append("")
+
+    summary_path = access_root / "access-summary.md"
+    _atomic_write(summary_path, "\n".join(body_lines))
+
+
+def _atomic_write(path: Path, body: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(body, encoding="utf-8")
+    tmp.replace(path)
 
 
 def _write_space_manifest(

@@ -3,9 +3,12 @@ page_id: '837517313'
 title: Claude Local MCP - Connecting Claude Desktop to Power BI
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/837517313/Claude+Local+MCP+-+Connecting+Claude+Desktop+to+Power+BI
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -21,7 +24,7 @@ contributors:
 - 712020:80f8cb27-5c7e-4ff8-ae31-4211dd953797
 contributors_count: 2
 content_hash: sha256:9dbef93bf17de0a09bc2e115c3d04e796b32d38c106a8a4f1031e243e3213de7
-synced_at: '2026-05-19T15:04:22Z'
+synced_at: '2026-05-20T14:49:51Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -29,7 +32,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 4
+days_since_modified: 5
 maintenance_signal: fresh
 word_count: 348
 char_count: 2512

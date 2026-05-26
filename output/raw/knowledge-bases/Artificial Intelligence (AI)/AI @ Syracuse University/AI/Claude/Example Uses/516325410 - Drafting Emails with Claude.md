@@ -3,9 +3,12 @@ page_id: '516325410'
 title: Drafting Emails with Claude
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/516325410/Drafting+Emails+with+Claude
-visibility_signal: accessible_to_sync_user
-restriction_check: not_checked
-restricted_to: []
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -22,7 +25,7 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 2
 content_hash: sha256:6bc882e2fde4a57f507bc7e3268f64926a0d5375be0e7b47e9be724bf518ba1c
-synced_at: '2026-05-19T15:03:43Z'
+synced_at: '2026-05-20T14:48:59Z'
 last_sync_status: ok
 labels: []
 tags_original: []
@@ -30,7 +33,7 @@ audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 188
+days_since_modified: 189
 maintenance_signal: aging
 word_count: 705
 char_count: 4321

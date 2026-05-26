@@ -142,10 +142,13 @@ def test_frontmatter_observed_fields_populated():
     assert fm["attachment_count"] == 3
     assert fm["tags_original"] == ["claude", "faq"]
     assert fm["labels"] == ["claude", "faq"]
-    # Defaults from PageMeta dataclass
-    assert fm["visibility_signal"] == "accessible_to_sync_user"
-    assert fm["restriction_check"] == "not_checked"
-    assert fm["restricted_to"] == []
+    # Phase 1.1 Step 2 (ADR-0007) defaults from PageMeta dataclass:
+    # absence of access classification = `unknown` (MCP filters it out).
+    assert fm["visibility_signal"] == "unknown"
+    assert fm["restriction_check"] == []
+    assert fm["restriction_source_ids"] == []
+    # `restricted_to` was dropped in schema v3 — must not appear.
+    assert "restricted_to" not in fm
 
 
 def test_frontmatter_tags_original_is_independent_copy():
@@ -161,17 +164,19 @@ def test_frontmatter_tags_original_is_independent_copy():
 
 
 def test_frontmatter_visibility_overrides_via_meta():
+    """Schema v3 (ADR-0007): list-shape restriction_check + restriction_source_ids."""
     meta = PageMeta(
         page_id="1", title="x", source_url="https://x",
         space_key="ITSAI", space_name="AI", space_type="global", space_category="knowledge-bases",
-        visibility_signal="restricted_direct",
-        restriction_check="checked_direct",
-        restricted_to=[{"type": "user", "id": "abc"}],
+        visibility_signal="restricted_inherited",
+        restriction_check=["direct", "ancestors", "space"],
+        restriction_source_ids=["1069121551"],
     )
     fm = build_frontmatter(meta, body_markdown="body")
-    assert fm["visibility_signal"] == "restricted_direct"
-    assert fm["restriction_check"] == "checked_direct"
-    assert fm["restricted_to"] == [{"type": "user", "id": "abc"}]
+    assert fm["visibility_signal"] == "restricted_inherited"
+    assert fm["restriction_check"] == ["direct", "ancestors", "space"]
+    assert fm["restriction_source_ids"] == ["1069121551"]
+    assert "restricted_to" not in fm
 
 
 def test_classifier_keys_preserved_across_resync(tmp_path: Path):
@@ -357,8 +362,12 @@ def test_classifier_preservation_survives_rename(tmp_path: Path):
 
 
 def test_frontmatter_schema_version_constant_exposed():
-    """Phase 1 introduces schema v2. The constant is the contract surface."""
-    assert FRONTMATTER_SCHEMA_VERSION == 2
+    """Phase 1.1 Step 2 (ADR-0007) bumps to schema v3.
+
+    The constant is the contract surface — bumps trigger state-driven
+    backfill via `SyncState.should_skip_by_version`.
+    """
+    assert FRONTMATTER_SCHEMA_VERSION == 3
 
 
 def test_serialized_yaml_field_ordering():
