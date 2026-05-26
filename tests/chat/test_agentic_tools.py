@@ -11,12 +11,23 @@ import pytest
 from sukb.chat import agentic_tools as at
 
 
-def _write_raw_page(dir_: Path, page_id: str, title: str, body: str) -> None:
+def _write_raw_page(
+    dir_: Path,
+    page_id: str,
+    title: str,
+    body: str,
+    visibility_signal: str = "no_read_restrictions_seen",
+) -> None:
+    """Phase 1.1 Step 3 (ADR-0009): defaults visibility_signal to the public
+    value so existing tests keep loading the fixture page. Tests for the
+    filter pass an explicit non-public visibility_signal.
+    """
     dir_.mkdir(parents=True, exist_ok=True)
     (dir_ / f"{page_id} - {title}.md").write_text(
         f"---\npage_id: '{page_id}'\ntitle: {title}\n"
         f"source_url: https://example.test/{page_id}\n"
-        f"ancestor_path: [Root, Sub]\n---\n{body}\n",
+        f"ancestor_path: [Root, Sub]\n"
+        f"visibility_signal: {visibility_signal}\n---\n{body}\n",
         encoding="utf-8",
     )
 

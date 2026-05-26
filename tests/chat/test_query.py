@@ -14,8 +14,20 @@ import pytest
 from sukb.chat import query as q
 
 
-def _write_page(dir_: Path, page_id: str, title: str, body: str, source_url: str = "") -> Path:
-    """Write a frontmatter-prefixed Markdown page to disk and return the path."""
+def _write_page(
+    dir_: Path,
+    page_id: str,
+    title: str,
+    body: str,
+    source_url: str = "",
+    visibility_signal: str = "no_read_restrictions_seen",
+) -> Path:
+    """Write a frontmatter-prefixed Markdown page to disk and return the path.
+
+    Defaults to `visibility_signal: no_read_restrictions_seen` so existing
+    tests that don't care about Phase 1.1 Step 3 filtering keep working.
+    Tests for the filter pass `visibility_signal=` explicitly.
+    """
     dir_.mkdir(parents=True, exist_ok=True)
     safe_title = title.replace("/", "_")
     path = dir_ / f"{page_id} - {safe_title}.md"
@@ -26,6 +38,7 @@ def _write_page(dir_: Path, page_id: str, title: str, body: str, source_url: str
         f"title: {title}\n"
         f"source_url: {src}\n"
         f"ancestor_path: [Root, Sub]\n"
+        f"visibility_signal: {visibility_signal}\n"
         f"---\n"
         f"{body}\n",
         encoding="utf-8",
@@ -373,6 +386,8 @@ def test_answer_query_loads_orientation_in_raw_plus_wiki_mode(tmp_path):
     actual ceiling — orientation + hubs + raw all in one prompt."""
     cfg = _make_config(tmp_path)
     _write_page(cfg.raw_path / "AI", "100", "P", "body")
+    _write_page(cfg.raw_path / "AI", "200", "P2", "body2")
+    _write_page(cfg.raw_path / "AI", "300", "P3", "body3")
     (cfg.output_dir / "CLAUDE.md").write_text("# Rules\nbody\n", encoding="utf-8")
     wiki = cfg.output_dir / "wiki"
     wiki.mkdir()

@@ -86,9 +86,20 @@ class RawPage:
     ancestor_path: list[str]
     body: str
     path: str  # relative to raw_path
+    # Phase 1.1 Step 3 (ADR-0009): access classification from the page's
+    # frontmatter. Default `unknown` so any page that somehow loads
+    # without a v3 frontmatter is treated as restricted by the MCP filter.
+    visibility_signal: str = "unknown"
 
     def to_citation(self) -> dict[str, Any]:
         return {"page_id": self.page_id, "title": self.title, "source_url": self.source_url}
+
+
+# Public-query allowlist (Phase 1.1 Step 3). Only this exact value is
+# queryable via the chat / agentic surfaces. Any other value — including
+# `restricted_direct`, `restricted_inherited`, `space_restricted`, `unknown`,
+# legacy `accessible_to_sync_user` — is filtered.
+PUBLIC_VISIBILITY_SIGNAL = "no_read_restrictions_seen"
 
 
 @dataclass
@@ -98,6 +109,11 @@ class WikiHub:
     synthesizes: list[str]
     body: str
     status: str = "draft"
+    # Phase 1.1 Step 3 (ADR-0009): tracks the synthesizes IDs that point
+    # at restricted (or unknown) raw pages. Hubs with a non-empty value
+    # here are EXCLUDED from `load_wiki_corpus` by default — the hub body
+    # may contain citations / quoted material from the restricted source.
+    restricted_source_ids: list[str] = field(default_factory=list)
 
     def to_citation(self) -> dict[str, Any]:
         return {"title": self.title, "filename": self.filename, "synthesizes": self.synthesizes}
@@ -141,15 +157,32 @@ def load_raw_corpus(
     config: SyncConfig,
     max_pages: int | None = None,
     include_test_pages: bool = False,
+    include_restricted: bool = False,
 ) -> list[RawPage]:
     """Walk `config.raw_path` and return every page-id-prefixed Markdown file.
 
     Skips: (a) hidden dirs like `.meta/`, (b) non-page Markdown files (e.g.
-    READMEs without a page-id prefix), and (c) by default, intern/test pages
-    under `(Test) …` or `Summer Intern 2026` — they're fixture content that
-    pollutes eval scores. Pass `include_test_pages=True` to keep them.
+    READMEs without a page-id prefix), and (c) by default:
+      - intern/test pages under `(Test) …` or `Summer Intern 2026` — these
+        are fixture content that pollutes eval scores (belt-and-braces
+        alongside the access classifier per ADR-0007 Step 3).
+      - pages whose frontmatter `visibility_signal` is not exactly
+        `no_read_restrictions_seen` — restricted, unknown, and legacy
+        `accessible_to_sync_user` are all filtered. This is the canonical
+        Phase 1.1 Step 3 enforcement layer; ADR-0009.
 
     Stable order: by ancestor_path then page_id.
+
+    Parameters
+    ----------
+    include_test_pages
+        If True, keep `(Test)` / `Summer Intern 2026` path-segment pages.
+        Defaults to False (eval/MCP path).
+    include_restricted
+        If True, return ALL pages regardless of `visibility_signal`. Use
+        only for the puller / probe / admin paths that need to inspect
+        restricted content. NEVER True for chat/agentic surfaces — the
+        public-query path must be fail-safe.
     """
     root = config.raw_path
     if not root.exists():
@@ -168,6 +201,9 @@ def load_raw_corpus(
         text = md.read_text(encoding="utf-8")
         fm, body = _split_frontmatter(text)
         page_id = str(fm.get("page_id") or m.group(1))
+        visibility = str(fm.get("visibility_signal") or "unknown")
+        if not include_restricted and visibility != PUBLIC_VISIBILITY_SIGNAL:
+            continue
         pages.append(
             RawPage(
                 page_id=page_id,
@@ -176,6 +212,7 @@ def load_raw_corpus(
                 ancestor_path=list(fm.get("ancestor_path") or []),
                 body=body.strip(),
                 path=str(md.relative_to(root)),
+                visibility_signal=visibility,
             )
         )
 
@@ -185,13 +222,39 @@ def load_raw_corpus(
     return pages
 
 
-def load_wiki_corpus(config: SyncConfig) -> list[WikiHub]:
+def load_wiki_corpus(
+    config: SyncConfig,
+    allowed_raw_ids: set[str] | None = None,
+    include_restricted: bool = False,
+) -> list[WikiHub]:
     """Walk `output/wiki/` and return reviewed+evergreen hubs.
 
     Draft hubs are excluded — the wiki-operating-model rule is "human promotes
     before it counts." Non-hub files (`type: index`, etc.) are also excluded
     here; the wiki index is loaded via `load_orientation_files` instead.
     If the wiki directory doesn't exist (Step 2 runs before Step 5), return [].
+
+    Phase 1.1 Step 3 (ADR-0009): when `allowed_raw_ids` is provided, hubs
+    are EXCLUDED if any of their `synthesizes` IDs are not in the allowed
+    set. The hub body may contain citations or quoted material from the
+    restricted source page, so partial filtering is unsafe. Better to drop
+    the whole hub than to surface a partially-redacted version that the
+    reviewer originally wrote against a different audience.
+
+    The `restricted_source_ids` field on the returned WikiHub objects
+    records the synthesizes IDs that were filtered — useful for trace /
+    debugging but never surfaced to the model.
+
+    Parameters
+    ----------
+    allowed_raw_ids
+        Set of raw page IDs that ARE queryable (i.e., classified
+        `no_read_restrictions_seen`). Usually `{p.page_id for p in
+        load_raw_corpus(config)}`. None disables the filter (callers
+        running outside the chat surface).
+    include_restricted
+        If True, return all hubs regardless of restricted source pages.
+        Defense-of-last-resort escape hatch for admin/audit paths.
     """
     wiki_root = config.output_dir / "wiki"
     if not wiki_root.exists():
@@ -206,13 +269,22 @@ def load_wiki_corpus(config: SyncConfig) -> list[WikiHub]:
             continue  # don't expose drafts or deprecated hubs to queries
         if str(fm.get("type") or "hub").lower() != "hub":
             continue  # type: index files are orientation, not hubs
+
+        synthesizes = [str(x) for x in (fm.get("synthesizes") or [])]
+        restricted_source_ids: list[str] = []
+        if allowed_raw_ids is not None:
+            restricted_source_ids = [sid for sid in synthesizes if sid not in allowed_raw_ids]
+            if restricted_source_ids and not include_restricted:
+                continue  # drop the hub entirely — see docstring
+
         hubs.append(
             WikiHub(
                 title=str(fm.get("title") or md.stem),
                 filename=md.name,
-                synthesizes=[str(x) for x in (fm.get("synthesizes") or [])],
+                synthesizes=synthesizes,
                 body=body.strip(),
                 status=status,
+                restricted_source_ids=restricted_source_ids,
             )
         )
     return hubs
@@ -333,10 +405,22 @@ def build_messages_payload(
 def extract_citations(
     answer: str,
     raw_pages: Iterable[RawPage],
+    restricted_page_ids: set[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Pull `[[<page-id>]]` references from the answer, dedupe, resolve to titles."""
+    """Pull `[[<page-id>]]` references from the answer, dedupe, resolve to titles.
+
+    Phase 1.1 Step 3 (ADR-0009): citations that resolve to filtered pages
+    are surfaced as `(restricted — not available)` rather than `(unresolved)`.
+    This distinguishes a real corpus gap from an access-policy gap for the
+    UI / trace, but both forms hide the underlying page's title and URL.
+
+    `restricted_page_ids`, when provided, names IDs we know to be filtered
+    by the access classifier. Without it, all unresolved citations are
+    surfaced as generic `(unresolved)` — backward-compatible.
+    """
     seen: list[str] = []
     by_id = {p.page_id: p for p in raw_pages}
+    restricted = restricted_page_ids or set()
     for m in CITATION_RE.finditer(answer):
         pid = m.group(1)
         if pid in seen:
@@ -348,8 +432,12 @@ def extract_citations(
         p = by_id.get(pid)
         if p:
             out.append(p.to_citation())
+        elif pid in restricted:
+            # Citation points at a page the access classifier filtered out.
+            # Surface a sentinel — never the real title or URL.
+            out.append({"page_id": pid, "title": "(restricted — not available)", "source_url": ""})
         else:
-            # Citation that doesn't resolve — surface it so the UI can flag.
+            # Citation that doesn't resolve to any page in the corpus.
             out.append({"page_id": pid, "title": "(unresolved)", "source_url": ""})
     return out
 
@@ -391,7 +479,15 @@ def answer_query(
         raise ValueError("question must be non-empty")
 
     raw_pages = load_raw_corpus(config, max_pages=max_pages)
-    wiki_pages = load_wiki_corpus(config) if mode == "raw+wiki" else []
+    allowed_raw_ids = {p.page_id for p in raw_pages}
+    # Discover the restricted set in one extra pass — the chat surface
+    # uses this to differentiate restricted citations from unresolved.
+    # Cheap (just the same disk walk again with include_restricted=True),
+    # and only runs at the chat-request boundary, not per-token.
+    all_pages = load_raw_corpus(config, max_pages=max_pages, include_restricted=True)
+    restricted_page_ids = {p.page_id for p in all_pages if p.page_id not in allowed_raw_ids}
+
+    wiki_pages = load_wiki_corpus(config, allowed_raw_ids=allowed_raw_ids) if mode == "raw+wiki" else []
     orientation = load_orientation_files(config) if mode == "raw+wiki" else []
     effective_mode = "raw+wiki" if (mode == "raw+wiki" and wiki_pages) else "raw"
 
@@ -404,7 +500,7 @@ def answer_query(
     latency_ms = int((time.perf_counter() - t0) * 1000)
 
     answer = _extract_text(response)
-    citations = extract_citations(answer, raw_pages)
+    citations = extract_citations(answer, raw_pages, restricted_page_ids=restricted_page_ids)
     usage = _usage_dict(response)
     cost = estimate_cost_usd(usage)
 
