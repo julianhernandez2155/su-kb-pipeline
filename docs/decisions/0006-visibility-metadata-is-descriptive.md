@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: superseded by [0007](0007-access-classification-v1.md)
 date: 2026-05-19
 supersedes:
 ---

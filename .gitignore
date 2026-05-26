@@ -21,6 +21,15 @@ dist/
 output/query-sessions/*
 !output/query-sessions/.gitkeep
 
+# Phase 1.1 access classification (ADR-0007):
+# - access-manifest.jsonl carries normalized account IDs + raw API responses
+#   containing user emails. Treat like .env -- never commit.
+# - spaces.json carries the full /spaces/{id}/permissions raw with group IDs.
+# - access-summary.md IS committed; it's sanitized (counts + folder source
+#   names only, no PII).
+output/_access/access-manifest.jsonl
+output/_access/spaces.json
+
 # Runtime junk at project root
 job.json
 response.json
