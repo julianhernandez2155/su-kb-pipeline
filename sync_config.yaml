@@ -23,6 +23,15 @@ excluded_keys:
 enabled_keys:
   - ITSAI
 
+# Phase 1.1 access classification (ADR-0007): spaces operator-declared as
+# broadly accessible to the SU community. Overrides the positive-ID heuristic
+# (role:ANONYMOUS read/space marker) — use sparingly.
+# Leave empty if every listed space has the standard role:ANONYMOUS marker;
+# positive ID handles the common case. List a space here only when the
+# marker is missing for legitimate reasons (e.g., a space that's restricted
+# to a known SU-wide group via a custom group ID).
+broadly_accessible_spaces: []
+
 output_dir: ./output
 api_base: https://su-jsm.atlassian.net/wiki/api/v2
 rate_limit_per_sec: 5

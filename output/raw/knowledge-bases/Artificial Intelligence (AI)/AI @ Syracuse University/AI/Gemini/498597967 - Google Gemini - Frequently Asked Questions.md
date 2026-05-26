@@ -3,6 +3,12 @@ page_id: '498597967'
 title: Google Gemini - Frequently Asked Questions
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/498597967/Google+Gemini+-+Frequently+Asked+Questions
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 2
 content_hash: sha256:a217654707a8524b3d09155e70a19614dd09657c7ceebd8ac2b8c5b608cb1a09
-synced_at: '2026-05-13T16:55:24Z'
+synced_at: '2026-05-20T14:48:40Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 195
+days_since_modified: 201
 maintenance_signal: aging
+word_count: 338
+char_count: 2386
+token_estimate: 682
+attachment_count: 0
 conversion_warnings: []
 ---
 

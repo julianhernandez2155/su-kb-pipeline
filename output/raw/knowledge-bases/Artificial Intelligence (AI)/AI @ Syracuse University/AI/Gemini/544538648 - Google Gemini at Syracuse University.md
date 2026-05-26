@@ -3,6 +3,12 @@ page_id: '544538648'
 title: Google Gemini at Syracuse University
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544538648/Google+Gemini+at+Syracuse+University
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +23,20 @@ contributors:
 - 712020:4c323a6a-283a-4261-80da-1e662db12cda
 contributors_count: 1
 content_hash: sha256:c19479caf5e35e2814682a1a4e8d1c9b8601c94680028a7d28a1eea0615d7188
-synced_at: '2026-05-13T16:55:55Z'
+synced_at: '2026-05-20T14:49:24Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 195
+days_since_modified: 201
 maintenance_signal: aging
+word_count: 371
+char_count: 2968
+token_estimate: 848
+attachment_count: 0
 conversion_warnings: []
 ---
 

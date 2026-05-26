@@ -3,6 +3,12 @@ page_id: '837517313'
 title: Claude Local MCP - Connecting Claude Desktop to Power BI
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/837517313/Claude+Local+MCP+-+Connecting+Claude+Desktop+to+Power+BI
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -11,21 +17,27 @@ ancestor_path:
 - AI @ Syracuse University
 - AI
 - Claude
-last_modified: '2026-02-20T20:46:04.702Z'
-version: 2
+last_modified: '2026-05-15T13:58:16.892Z'
+version: 3
 contributors:
+- 712020:4c323a6a-283a-4261-80da-1e662db12cda
 - 712020:80f8cb27-5c7e-4ff8-ae31-4211dd953797
-contributors_count: 1
-content_hash: sha256:63f3e08e721f2b789f1937a797b309ca379fb268afc7c43b695d4be382800261
-synced_at: '2026-05-13T16:56:16Z'
+contributors_count: 2
+content_hash: sha256:9dbef93bf17de0a09bc2e115c3d04e796b32d38c106a8a4f1031e243e3213de7
+synced_at: '2026-05-20T14:49:51Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 81
+days_since_modified: 5
 maintenance_signal: fresh
+word_count: 348
+char_count: 2512
+token_estimate: 718
+attachment_count: 7
 conversion_warnings: []
 ---
 
@@ -45,7 +57,7 @@ Search for the Power BI Modeling MCP extension from VS Code, and download the on
 
 ![[attachments/837517313/image-20260220-192341.png|760]]
 
-1. Fine the powerbi-modeling-mcp.exe file from the VS Code extension file. You can find it from a similar file path:
+1. Find the powerbi-modeling-mcp.exe file from the VS Code extension file. You can find it from a similar file path:
 
 ```
 C:\Users\<YourUsername>\.vscode\extensions\analysis-services.powerbi-modeling-mcp-0.1.9-win32-x64\server
@@ -78,7 +90,7 @@ C:\Users\<YourUsername>\.vscode\extensions\analysis-services.powerbi-modeling-mc
 ![[attachments/837517313/image-20260220-194005.png|760]]
 
 > [!info]
-> For adding more mcps, you can use simialr measure by using , seperating them see example below
+> For adding more mcps, you can use similar measure by using , separating them see example below
 
 ```
 {

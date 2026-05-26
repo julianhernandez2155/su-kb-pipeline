@@ -17,7 +17,7 @@ This document supersedes [`next-phase-plan.md`](next-phase-plan.md) after Steps 
 
 Paste this as the first message of the new chat:
 
-> Read `SU_AI_Intern/research/kb-ingestion-project/v1-tool-brief.md`, `wiki-operating-model.md`, `eval-baseline-2026-05-13.md`, `wiki-proposals-2026-05-13.md`, and `next-phase-plan-v2.md` in that order. Then execute the plan starting at the "Pre-Step-6: orientation files" task. Stop after each step for review.
+> Read `SU_AI_Intern/research/kb-ingestion-project/v1-tool-brief.md`, `wiki-operating-model.md`, `eval-baseline-2026-05-13.md`, `archive/wiki-proposals-2026-05-13.md`, and `next-phase-plan-v2.md` in that order. Then execute the plan starting at the "Pre-Step-6: orientation files" task. Stop after each step for review.
 
 ---
 
@@ -40,9 +40,9 @@ The original plan assumed the production architecture would be a FTS5+RAG MCP se
 | Chat interface backend (`/api/query`) | ✅ | `prototypes/.../kb_ingest/api/query.py` |
 | Chat tab UI + session save/load | ✅ | `prototypes/.../frontend/index.html`, `kb_ingest/api/sessions.py` |
 | Baseline raw-only eval | ✅ **14 ✅ / 1 ⚠️ / 0 ❌** | [`eval-baseline-2026-05-13.md`](eval-baseline-2026-05-13.md), [`eval-runs/eval-baseline-raw-20260513T135909.json`](../../prototypes/confluence-to-md-v2/eval-runs/eval-baseline-raw-20260513T135909.json) |
-| Karpathy proposal pass | ✅ 2 candidates, 6 rejected | [`wiki-proposals-2026-05-13.md`](wiki-proposals-2026-05-13.md) |
+| Karpathy proposal pass | ✅ 2 candidates, 6 rejected | [`archive/wiki-proposals-2026-05-13.md`](archive/wiki-proposals-2026-05-13.md) |
 | Wiki hubs (Step 5) | ✅ both `status: reviewed` | `prototypes/.../output/wiki/approved-ai-tools-for-university-data.md`, `claude-at-syracuse-product-surface-map.md` |
-| Test suite | ✅ 110/110 green | `prototypes/.../tests/` |
+| Test suite | ✅ 257/257 green | `prototypes/.../tests/` |
 | Saved query sessions (eval traces) | ✅ 15 sessions | `prototypes/.../output/query-sessions/` |
 
 **Total cost incurred:** ~$0.39 in legitimate end-user-simulation queries + ~$2.76 in project-internal LLM work that should have been done in-session (the run_proposals.py + draft_hubs.py runs — see Cost Discipline section below).

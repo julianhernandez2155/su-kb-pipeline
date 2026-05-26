@@ -3,6 +3,12 @@ page_id: '700121089'
 title: mentorAI - Tools
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/700121089/mentorAI+-+Tools
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +23,20 @@ contributors:
 - 712020:4c323a6a-283a-4261-80da-1e662db12cda
 contributors_count: 1
 content_hash: sha256:128b4f758664249132c37e6b3f3f1b7b88d8bd6be4398009b33600a01f9523d0
-synced_at: '2026-05-13T16:56:10Z'
+synced_at: '2026-05-20T14:49:44Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 126
+days_since_modified: 132
 maintenance_signal: aging
+word_count: 304
+char_count: 2061
+token_estimate: 589
+attachment_count: 6
 conversion_warnings: []
 ---
 

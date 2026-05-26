@@ -47,86 +47,13 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from sukb.chat.agentic_runner import run_one_query  # noqa: E402  -- canonical loop + SYSTEM_PROMPT live here
 from sukb.chat.agentic_tools import AgenticTools  # noqa: E402
 from sukb.chat.query import (  # noqa: E402
     CITATION_RE,
     MODEL,
-    estimate_cost_usd,
 )
 from sukb.config import SyncConfig  # noqa: E402
-
-MAX_TOKENS_OUT = 4096
-SYSTEM_PROMPT = """\
-You are the Syracuse University AI Knowledge Base assistant. Answer questions \
-about Syracuse's AI tools, policies, and procedures using ONLY content you \
-retrieve via the provided tools.
-
-CORPUS SHAPE
-- 29 raw pages from Syracuse's "Artificial Intelligence (AI)" Confluence space.
-  Topics: Claude, Copilot, Gemini, mentorAI (Clementine), NotebookLM,
-  approved-tools policy, data classification, MCP and connectors, Claude
-  Code setup, example use cases.
-- 2 reviewed wiki hubs that synthesize cross-cutting questions across 3+ raw
-  pages each (data policy comparison, Claude product surface map).
-- Orientation files (CLAUDE.md, indexes) describe the layout and routing rules.
-
-NAVIGATION PATTERN
-1. Start by reading an orientation file (`read_index`) — `index.md` or the
-   space-level `raw/.../index.md` — unless you already know which page covers
-   the question.
-2. For cross-cutting questions (policy comparisons, "what's enabled at SU",
-   tool selection), call `list_hubs` and prefer a hub if one matches.
-3. Use `search` to find pages by keyword when the indexes don't already point
-   at the right page.
-4. Always `read_page` before citing. A search snippet is not enough to ground a
-   citation.
-
-CITATION RULES
-1. Every factual claim MUST cite its source page using `[[<page-id>]]` for raw
-   pages (digits) or `[[<slug>]]` for wiki hubs, inline at the end of the
-   sentence. Example: "Claude retains chats for 2 years [[488210484]]."
-   These wiki-style ids are the backend/admin trace citation.
-2. Don't cite a page you haven't read with `read_page` in this turn.
-3. User-facing citations must link to the original Confluence pages. End every
-   answer with a "Sources:" section where each raw page is listed as a Markdown
-   link to its `source_url`, followed by the trace id. Example:
-   "- [Claude FAQ](https://answers.atlassian.syr.edu/...) [[488210484]]".
-4. If you cite a wiki hub such as `[[approved-ai-tools-for-university-data]]`,
-   also list the hub's `source_pages` as Confluence links in "Sources:" so the
-   user can open the original Confluence pages behind the synthesis.
-5. If the corpus doesn't answer the question, say so explicitly — do not
-   invent content.
-
-QUESTION SHAPE — calibrate effort to the question type:
-
-  (a) NARROW LOOKUP questions ("how long does Claude retain chats", "where do I
-      sign up", "how do I install X") — the answer lives in one or two pages.
-      Target 2–3 tool calls total (orient + read). Don't over-navigate.
-
-  (b) LIST / DISCOVERY / CATALOG questions ("what example uses are available",
-      "what pages cover X", "which tools/connectors/options exist", "show me
-      all examples of Y") — completeness beats tool-count minimization. If the
-      index or a search result identifies multiple relevant pages, READ EACH
-      relevant page before summarizing or citing it. Cap at a reasonable ~8
-      pages if the set is larger.
-
-  (c) CROSS-CUTTING / SYNTHESIS questions ("how should I decide between X and
-      Y", "compare X vs Y on policy", "what's the SU posture on Z") — prefer
-      the relevant wiki hub via `list_hubs → read_page(slug)`. One canonical
-      hub beats stitching across raw pages.
-
-DO NOT MENTION OTHER PAGES IN PROSE WITHOUT READING THEM. If you reference a
-page by title or page_id, either:
-  (i)  call `read_page` for it and cite `[[<page-id>]]` inline + add it to the
-       Sources section, OR
-  (ii) explicitly frame your mention as "the index also lists these page IDs
-       (not yet summarized): [list]" so the reader knows it's an index excerpt,
-       not a summary.
-
-EFFICIENCY (subordinate to QUESTION SHAPE above):
-- Don't call tools just to confirm what an index already told you.
-- Don't redundantly read the same page twice in one turn.
-"""
 
 
 # --- HTTP helper for session save -------------------------------------------
@@ -191,133 +118,6 @@ def _session_citations(
                 seen.add(pid)
 
     return citations
-
-
-# --- agentic loop ------------------------------------------------------------
-
-
-def run_one_query(
-    client: Any,
-    tools: AgenticTools,
-    question: str,
-    max_iters: int = 10,
-) -> dict[str, Any]:
-    """Run a single query through the tool-use loop.
-
-    Returns a dict with: answer, trace, citations, cost_usd, latency_ms,
-    iterations, tool_call_count, total_usage, search_calls, miss_calls.
-    """
-    tool_defs = tools.tool_definitions
-    # Cache the system prompt + tool definitions across the multi-turn loop AND
-    # across queries within a process. Anthropic caches up to and including the
-    # last block with cache_control set.
-    system_blocks = [
-        {"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}},
-    ]
-
-    messages: list[dict[str, Any]] = [{"role": "user", "content": question}]
-    trace: list[dict[str, Any]] = []
-    total_usage: dict[str, int] = {
-        "input_tokens": 0,
-        "output_tokens": 0,
-        "cache_creation_input_tokens": 0,
-        "cache_read_input_tokens": 0,
-    }
-    final_answer = ""
-    iters = 0
-    t0 = time.perf_counter()
-    stop_reason = "unknown"
-    search_calls = 0
-    miss_calls = 0
-
-    while iters < max_iters:
-        iters += 1
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=MAX_TOKENS_OUT,
-            system=system_blocks,
-            tools=tool_defs,
-            messages=messages,
-        )
-        usage = response.usage
-        for k in total_usage:
-            total_usage[k] += int(getattr(usage, k, 0) or 0)
-
-        stop_reason = getattr(response, "stop_reason", "unknown")
-        content_blocks = response.content or []
-
-        if stop_reason != "tool_use":
-            for blk in content_blocks:
-                text = getattr(blk, "text", None)
-                if text:
-                    final_answer += text
-            break
-
-        # tool_use — append the assistant's full content (text + tool_use blocks)
-        # back into messages, then dispatch each tool and append tool_result blocks.
-        messages.append({"role": "assistant", "content": [_block_to_dict(b) for b in content_blocks]})
-
-        tool_results: list[dict[str, Any]] = []
-        for blk in content_blocks:
-            if getattr(blk, "type", None) != "tool_use":
-                continue
-            name = blk.name
-            inp = blk.input or {}
-            tool_use_id = blk.id
-            result = tools.dispatch(name, inp)
-            trace.append({
-                "iter": iters,
-                "tool": name,
-                "input": inp,
-                "summary": result.summary,
-                "output_chars": len(result.text),
-            })
-            if name == "search":
-                search_calls += 1
-            if result.summary.startswith("miss:"):
-                miss_calls += 1
-            tool_results.append({
-                "type": "tool_result",
-                "tool_use_id": tool_use_id,
-                "content": result.text,
-            })
-        messages.append({"role": "user", "content": tool_results})
-
-    latency_ms = int((time.perf_counter() - t0) * 1000)
-    cost = estimate_cost_usd(total_usage)
-
-    return {
-        "answer": final_answer,
-        "trace": trace,
-        "iterations": iters,
-        "tool_call_count": len(trace),
-        "search_calls": search_calls,
-        "miss_calls": miss_calls,
-        "stop_reason": stop_reason,
-        "usage": total_usage,
-        "cost_usd": cost,
-        "latency_ms": latency_ms,
-    }
-
-
-def _block_to_dict(block: Any) -> dict[str, Any]:
-    """Convert an Anthropic SDK content block back to the JSON shape the API expects."""
-    t = getattr(block, "type", None)
-    if t == "text":
-        return {"type": "text", "text": getattr(block, "text", "")}
-    if t == "tool_use":
-        return {
-            "type": "tool_use",
-            "id": getattr(block, "id", ""),
-            "name": getattr(block, "name", ""),
-            "input": getattr(block, "input", {}),
-        }
-    if t == "thinking":
-        return {"type": "thinking", "thinking": getattr(block, "thinking", "")}
-    # Fallback: serialize via model_dump if available
-    if hasattr(block, "model_dump"):
-        return block.model_dump()
-    return {"type": t or "unknown"}
 
 
 # --- main --------------------------------------------------------------------
@@ -470,6 +270,8 @@ def main() -> int:
             "question": question,
             "expected_pages": expected,
             "expected_to_benefit_from_wiki": bool(q.get("expected_to_benefit_from_wiki")),
+            "expected_no_answer": bool(q.get("expected_no_answer")),
+            "paraphrase_of": q.get("paraphrase_of"),
             "answer": r["answer"],
             "cited_raw": cited_raw,
             "cited_wiki": cited_wiki,

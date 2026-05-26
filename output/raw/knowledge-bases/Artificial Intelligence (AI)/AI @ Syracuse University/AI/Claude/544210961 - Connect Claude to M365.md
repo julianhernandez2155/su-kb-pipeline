@@ -3,6 +3,12 @@ page_id: '544210961'
 title: Connect Claude to M365
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544210961/Connect+Claude+to+M365
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:785e1c5fc1a4dccee8f9c5afbe2e4437fbfd675c647104a729af0792168153da
-synced_at: '2026-05-13T16:55:53Z'
+synced_at: '2026-05-20T14:49:20Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 78
+days_since_modified: 85
 maintenance_signal: fresh
+word_count: 185
+char_count: 1321
+token_estimate: 378
+attachment_count: 3
 conversion_warnings: []
 ---
 

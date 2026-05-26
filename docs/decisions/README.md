@@ -11,6 +11,11 @@ This directory holds ADRs (Architecture Decision Records) for `su-kb-pipeline` i
 | [0003](0003-rag-pipeline-mcp-architecture.md) | RAG-pipeline MCP architecture (original) | superseded by [0004](0004-agentic-tool-surface-mcp-architecture.md) | 2026-05-05 |
 | [0004](0004-agentic-tool-surface-mcp-architecture.md) | Agentic tool-surface MCP architecture | accepted | 2026-05-13 |
 | [0005](0005-src-layout-and-sukb-package-rename.md) | `src/` layout + `sukb` package rename | accepted | 2026-05-14 |
+| [0006](0006-visibility-metadata-is-descriptive.md) | Visibility metadata is descriptive, not enforcement (original) | superseded by [0007](0007-access-classification-v1.md) | 2026-05-19 |
+| [0007](0007-access-classification-v1.md) | Access classification v1 — direct + ancestor + space layers | accepted | 2026-05-19 |
+| [0008](0008-space-classifier-tightening.md) | Space classifier: positive-ID via role:ANONYMOUS + allowlist fallback | accepted | 2026-05-20 |
+| [0009](0009-mcp-read-path-filter.md) | MCP read-path filter: load-time gate in the corpus loader | accepted | 2026-05-20 |
+| [0010](0010-trust-zones-admin-vs-mcp.md) | Trust zones: admin web UI vs user-facing MCP retrieval | accepted | 2026-05-21 |
 
 ## Adding a new ADR
 

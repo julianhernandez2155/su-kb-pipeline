@@ -3,6 +3,12 @@ page_id: '488210484'
 title: Claude - Frequently Asked Questions
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/488210484/Claude+-+Frequently+Asked+Questions
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:a3e4e657a8a0ce825834f75256cc8596f6ad39fb0eda64c41866bc0efe5e38ea
-synced_at: '2026-05-13T16:55:22Z'
+synced_at: '2026-05-20T14:48:37Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 61
+days_since_modified: 67
 maintenance_signal: fresh
+word_count: 1771
+char_count: 12522
+token_estimate: 3578
+attachment_count: 0
 conversion_warnings: []
 ---
 

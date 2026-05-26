@@ -4,11 +4,11 @@
   "space_name": "Artificial Intelligence (AI)",
   "space_type": "knowledge_base",
   "page_count": 34,
-  "last_sync": "2026-05-13T16:56:28Z",
+  "last_sync": "2026-05-20T14:51:20Z",
   "last_summary": {
     "pages_total": 34,
-    "pages_converted": 34,
-    "pages_skipped": 0,
+    "pages_converted": 0,
+    "pages_skipped": 34,
     "pages_failed": 0
   }
 }

@@ -1,0 +1,271 @@
+{
+  "run_stamp": "20260518T142646",
+  "mode": "agentic",
+  "model": "claude-sonnet-4-6",
+  "total_queries": 3,
+  "completed": 3,
+  "total_cost_usd": 0.11993,
+  "avg_tool_calls_per_query": 3.33,
+  "corpus": {
+    "raw_pages": 29,
+    "wiki_hubs": 2,
+    "orientation_files": 4
+  },
+  "results": [
+    {
+      "id": "q06",
+      "type": "where-do-i",
+      "question": "How do I install Claude Code on Windows?",
+      "expected_pages": [
+        "986841103",
+        "540934169"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a complete guide to installing Claude Code on Windows:\n\n---\n\n## Installing Claude Code on Windows\n\n### Step 1: Get Access to Claude Code\nFirst, you need to obtain a Claude Code subscription. This is a paid add-on — refer to the purchasing options available through Syracuse University before proceeding [[986841103]].\n\n---\n\n### Step 2: Install Claude Code & Development Tools\n\nSyracuse University provides an automated PowerShell script (`Install-DevTools.ps1`) that handles everything for you. It auto-detects your system architecture (AMD64 or ARM64) and installs portable versions of all required tools [[986841103]]:\n\n| Tool | Version | Notes |\n|---|---|---|\n| Node.js | 24.12.0 | Portable/embedded |\n| Git Portable | 2.52.0 | Includes Git Bash |\n| Python Embeddable | 3.14.3 | Skipped if system Python detected |\n| VS Code Portable | Latest | Skipped if already installed |\n| GitHub Desktop | Latest | Visual interface for Git |\n| PowerShell 7 | Latest | Via winget; skipped if already installed |\n| Claude Code | Latest | Always installs locally |\n\nBy default, tools install to your **OneDrive** (`%OneDrive%\\Apps-SU\\[arch]\\<ToolName>`) for automatic sync across devices. Claude Code itself always installs locally to `%USERPROFILE%\\.local\\bin` [[986841103]].\n\n#### 2a. Set the Execution Policy\nOpen PowerShell and run:\n```powershell\nSet-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser\n```\n\n#### 2b. Download the Script\nDownload `Install-DevTools.ps1` from the [Claude Code Setup page](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup).\n\n#### 2c. Remove the \"Mark of the Web\"\nWindows blocks scripts downloaded from the internet. Unblock it using one of these methods:\n\n- **Option 1 (Recommended) — PowerShell:**\n  ```powershell\n  Unblock-File -Path \"$HOME\\Downloads\\Install-DevTools.ps1\"\n  ```\n- **Option 2 — File Properties:** Right-click the file → Properties → check **Unblock** → click OK.\n\n#### 2d. Run the Script\n```powershell\n# Installs all tools to OneDrive (default)\n.\\Install-DevTools.ps1\n```\n\n---\n\n### Step 3: Configure Claude Code\n\nOnce installation is complete [[986841103]]:\n\n1. Open a terminal and type `claude`\n2. Choose your preferred text display style\n3. Select **\"Anthropic Console account\"** (option 2) for your login method\n4. Sign in with your **`netid@syr.edu`** credentials in the browser window that opens — select the **Syracuse University** organization if prompted\n5. **Authorize Claude Code** in the browser\n6. Return to the terminal and press **Enter twice** to accept and trust the folder\n\n✅ **You're all set!** Claude Code is now ready to use.\n\n---\n\n### Troubleshooting Tips [[986841103]]\n- **Script won't run?** Use `Unblock-File` as described above, or bypass for a single session:\n  ```powershell\n  Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process\n  ```\n- **No OneDrive?** Add `-Location Local` to install locally instead.\n- **32-bit systems** are not supported — only AMD64 and ARM64.\n- **Restart your terminal** if tools aren't recognized after installation.\n- **Network issues?** Some corporate networks may block downloads; verify connectivity.\n\n---\n\n**Sources:**\n- [Claude Code Setup](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup) [[986841103]]",
+      "cited_raw": [
+        "986841103"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "986841103",
+          "title": "Claude Code Setup",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/986841103/Claude+Code+Setup"
+        }
+      ],
+      "hit_expected": [
+        "986841103"
+      ],
+      "missed_expected": [
+        "540934169"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Claude Code install Windows"
+          },
+          "summary": "query='Claude Code install Windows' → 5 hits: claude-at-syracuse-product-surface-map(wiki,113.85), 986841103(raw,79.0), 488210484(raw,75.0), 540934169(raw,46.5), 522158118(raw,42.0)",
+          "output_chars": 5088
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "986841103"
+          },
+          "summary": "raw 986841103 'Claude Code Setup' (6666 chars)",
+          "output_chars": 6903
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 5635,
+        "output_tokens": 1053,
+        "cache_creation_input_tokens": 2718,
+        "cache_read_input_tokens": 3892
+      },
+      "cost_usd": 0.04406,
+      "latency_ms": 20080,
+      "session_id": null
+    },
+    {
+      "id": "q10",
+      "type": "how-to",
+      "question": "How do I create a new mentor on the Clementine platform?",
+      "expected_pages": [
+        "535068673",
+        "567279621"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here is a step-by-step guide to creating a new mentor on the Clementine/mentorAI platform [[535068673]]:\n\n---\n\n## Creating a New Mentor on mentorAI\n\n### Step 1: Start a New Mentor\n- Click the **\"New Mentor\"** button on your dashboard.\n\n---\n\n### Step 2: Input Mentor Information\nFill in the following details:\n\n1. **Name** – Enter the mentor's name. This is the primary identifier for mentees looking to connect.\n2. **Description** – Write a brief bio covering the mentor's background, skills, and what type of mentorship they offer (e.g., career advice, skill development).\n3. **Category** – Select the appropriate category based on the mentor's expertise (e.g., Astronomy, Art, Anthropology). This helps mentees find relevant mentors.\n4. **Mentor Visibility** – Choose who can see the mentor: all students, select groups, or keep it private.\n5. **Image** – Upload a professional profile picture (optional, but recommended to enhance engagement).\n\n---\n\n### Step 3: Configure Prompts\nSet up how the mentor will interact with mentees:\n\n1. **System Prompts** – Review and edit the pre-populated prompts to match the mentor's style and focus areas.\n2. **Proactive Prompts** – Add engagement prompts to initiate discussions with mentees. Tailor these to encourage specific types of interactions.\n3. **Guided Prompts** – Set structured prompts to guide the mentor's responses. Make them relevant to the mentor's expertise and mentee needs.\n\n> 💡 **Tip:** Add your configured prompts at the **bottom of the default prompts** for more effective mentoring.\n\n---\n\n### Step 4: Save\n- Click the **Save** button to submit and publish the new mentor profile.\n\n---\n\n**Sources:**\n- [mentorAI Creating A Mentor](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor) [[535068673]]",
+      "cited_raw": [
+        "535068673"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "535068673",
+          "title": "mentorAI Creating A Mentor",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/535068673/mentorAI+Creating+A+Mentor"
+        }
+      ],
+      "hit_expected": [
+        "535068673"
+      ],
+      "missed_expected": [
+        "567279621"
+      ],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "search",
+          "input": {
+            "query": "Clementine mentorAI create mentor",
+            "top_k": 5
+          },
+          "summary": "query='Clementine mentorAI create mentor' → 5 hits: 567279621(raw,49.88), 591101962(raw,30.62), 895451142(raw,25.62), 535068673(raw,21.0), 544505857(raw,16.62)",
+          "output_chars": 2861
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "535068673"
+          },
+          "summary": "raw 535068673 'mentorAI Creating A Mentor' (2876 chars)",
+          "output_chars": 3153
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 2,
+      "search_calls": 1,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 3203,
+        "output_tokens": 625,
+        "cache_creation_input_tokens": 834,
+        "cache_read_input_tokens": 5838
+      },
+      "cost_usd": 0.023863,
+      "latency_ms": 13418,
+      "session_id": null
+    },
+    {
+      "id": "q15",
+      "type": "where-do-i",
+      "question": "Where can I find example uses of Claude for academic work?",
+      "expected_pages": [
+        "511246346",
+        "511279124",
+        "500236296",
+        "572194844",
+        "516325410"
+      ],
+      "expected_to_benefit_from_wiki": false,
+      "answer": "Here's a comprehensive overview of all the official example uses of Claude for academic and professional work at Syracuse University:\n\n---\n\n## 📚 Example Uses of Claude at Syracuse University\n\nThere are **5 dedicated example-use pages** in the SU AI Knowledge Base, all available through Claude Enterprise at [getclaude.syr.edu](https://getclaude.syr.edu):\n\n---\n\n### 1. 🔬 AI Research Assistant\nClaude can serve as a personal research assistant for academic coursework [[572194844]]:\n- **Upload up to 5 documents** (PDFs, Word docs, research articles) per conversation\n- **Summarize articles** in bullet points using an objective, academic tone\n- **Compare sources** side-by-side — generate a comparison table of research questions, methodologies, and conclusions\n- **Build literature review outlines** organized by theme, with research gaps noted\n- **Extract and organize quotes** with page numbers and significance explanations\n- Use **Projects** to store all readings for a course and reference them across multiple conversations\n- Use **Extended Thinking** for deeper analysis of complex research questions\n- Use **Web Search** to find recent studies (note: this draws from public web, not SU Library databases)\n\n---\n\n### 2. 📖 Study Project\nClaude can help you master course material [[511279124]]:\n- Create a **Study Project** and upload lecture slides, PDFs, or notes\n- Ask Claude to **summarize content into flashcards**, explain key concepts, quiz you, or summarize chapters\n\n---\n\n### 3. 💼 Career Project\nClaude can assist with job and internship applications [[511246346]]:\n- Upload your **resume and a job description**\n- Ask Claude to **tailor your resume** for a specific role\n- **Draft personalized cover letters** based on your profile\n- Practice **behavioral interview questions** and research companies\n\n---\n\n### 4. ✉️ Drafting Emails\nClaude can help you write professional emails quickly [[516325410]]:\n- Draft emails **to professors** (e.g., requesting extensions, clarifying material)\n- Write **thank-you or networking emails** to recruiters or alumni\n- Coordinate **group project communication**\n- Use the **Artifact panel** to edit and refine drafts iteratively (tip: add \"put it in an artifact\" to your prompt)\n- Note: Claude does not integrate directly with Gmail or Outlook — you'll copy and paste the final draft\n\n---\n\n### 5. 📋 Meeting Summaries\nClaude can transform Zoom or Teams transcripts into structured summaries [[500236296]]:\n- Generate **formal meeting minutes**, topic-based summaries, action-item lists, or quick 5-minute summaries\n- Use the pre-built **Meeting Transcripts Project** on Claude.ai, which has prompts already in place\n- Works with `.txt` (Zoom) or `.docx` (Teams) transcript files\n- Note: Claude cannot transcribe live audio — you must provide an existing transcript\n\n---\n\n## 💡 Tips Across All Use Cases\n- Use **Claude Projects** to organize materials by course or topic — files are remembered across conversations\n- Always **review Claude's output** before submitting or sending — it's a starting point, not a final product\n- Never include **FERPA-protected, confidential, or sensitive university data** in prompts\n- For research, always **verify sources** through SU Libraries for peer-reviewed material\n\n---\n\n## Sources\n\n- [AI Research Assistant with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude) [[572194844]]\n- [Claude Study Project](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project) [[511279124]]\n- [Claude Career Project](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511246346/Claude+Career+Project) [[511246346]]\n- [Drafting Emails with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/516325410/Drafting+Emails+with+Claude) [[516325410]]\n- [Meeting Summaries with Claude](https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/500236296/Meeting+Summaries+with+Claude) [[500236296]]",
+      "cited_raw": [
+        "572194844",
+        "511279124",
+        "511246346",
+        "516325410",
+        "500236296"
+      ],
+      "cited_wiki": [],
+      "citations": [
+        {
+          "page_id": "572194844",
+          "title": "AI Research Assistant with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude"
+        },
+        {
+          "page_id": "511279124",
+          "title": "Claude Study Project",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511279124/Claude+Study+Project"
+        },
+        {
+          "page_id": "511246346",
+          "title": "Claude Career Project",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/511246346/Claude+Career+Project"
+        },
+        {
+          "page_id": "516325410",
+          "title": "Drafting Emails with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/516325410/Drafting+Emails+with+Claude"
+        },
+        {
+          "page_id": "500236296",
+          "title": "Meeting Summaries with Claude",
+          "source_url": "https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/500236296/Meeting+Summaries+with+Claude"
+        }
+      ],
+      "hit_expected": [
+        "511246346",
+        "511279124",
+        "500236296",
+        "572194844",
+        "516325410"
+      ],
+      "missed_expected": [],
+      "extra_pages": [],
+      "trace": [
+        {
+          "iter": 1,
+          "tool": "read_index",
+          "input": {
+            "path": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md"
+          },
+          "summary": "raw/knowledge-bases/Artificial Intelligence (AI)/index.md (5839 chars)",
+          "output_chars": 5964
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "500236296"
+          },
+          "summary": "raw 500236296 'Meeting Summaries with Claude' (5305 chars)",
+          "output_chars": 5593
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "511246346"
+          },
+          "summary": "raw 511246346 'Claude Career Project' (627 chars)",
+          "output_chars": 891
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "511279124"
+          },
+          "summary": "raw 511279124 'Claude Study Project' (579 chars)",
+          "output_chars": 840
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "516325410"
+          },
+          "summary": "raw 516325410 'Drafting Emails with Claude' (4320 chars)",
+          "output_chars": 4602
+        },
+        {
+          "iter": 2,
+          "tool": "read_page",
+          "input": {
+            "id": "572194844"
+          },
+          "summary": "raw 572194844 'AI Research Assistant with Claude' (5630 chars)",
+          "output_chars": 5930
+        }
+      ],
+      "iterations": 3,
+      "tool_call_count": 6,
+      "search_calls": 0,
+      "miss_calls": 0,
+      "stop_reason": "end_turn",
+      "usage": {
+        "input_tokens": 9007,
+        "output_tokens": 1348,
+        "cache_creation_input_tokens": 804,
+        "cache_read_input_tokens": 5838
+      },
+      "cost_usd": 0.052007,
+      "latency_ms": 27826,
+      "session_id": null
+    }
+  ]
+}

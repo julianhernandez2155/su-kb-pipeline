@@ -91,15 +91,46 @@ class AgenticTools:
 
     def __init__(self, config: SyncConfig):
         self.config = config
+        # Phase 1.1 Step 3 (ADR-0009): load the public raw corpus first,
+        # then pass its allowlist of IDs to load_wiki_corpus so hubs whose
+        # synthesizes references a restricted page are dropped entirely.
+        # Defense in depth: _source_pages_for_hub also filters at resolve
+        # time, and _read_page returns the generic miss response (same
+        # external message as a nonexistent page) for restricted IDs.
         self.raw_pages: list[RawPage] = load_raw_corpus(config)
-        self.wiki_hubs: list[WikiHub] = load_wiki_corpus(config)
+        self._allowed_raw_ids: set[str] = {p.page_id for p in self.raw_pages}
+        self.wiki_hubs: list[WikiHub] = load_wiki_corpus(
+            config, allowed_raw_ids=self._allowed_raw_ids
+        )
         self.orientation: list[OrientationFile] = load_orientation_files(config)
         self._by_page_id: dict[str, RawPage] = {p.page_id: p for p in self.raw_pages}
         self._by_slug: dict[str, WikiHub] = {Path(w.filename).stem: w for w in self.wiki_hubs}
         self._by_relpath: dict[str, OrientationFile] = {o.relpath: o for o in self.orientation}
+        # Per-instance metrics for the eval trace: how many hubs were
+        # dropped from the public surface because of restricted synthesizes,
+        # and the full set of restricted raw page IDs so `_read_page` can
+        # mark the summary differently when an explicit restricted-ID
+        # request comes in (the EXTERNAL text response stays identical to
+        # the nonexistent-page case — never leak to the model).
+        all_hubs = load_wiki_corpus(
+            config, allowed_raw_ids=self._allowed_raw_ids, include_restricted=True
+        )
+        self.dropped_hub_count: int = len(all_hubs) - len(self.wiki_hubs)
+        all_raw = load_raw_corpus(config, include_restricted=True)
+        self._restricted_raw_ids: set[str] = {
+            p.page_id for p in all_raw if p.page_id not in self._allowed_raw_ids
+        }
 
     def _source_pages_for_hub(self, hub: WikiHub) -> list[dict[str, str]]:
-        """Resolve a hub's synthesized raw page ids to user-facing source URLs."""
+        """Resolve a hub's synthesized raw page ids to user-facing source URLs.
+
+        Defense-in-depth (Phase 1.1 Step 3, ADR-0009): a synthesizes ID that
+        isn't in the public-allowed set surfaces as `(restricted)` rather
+        than the real title / URL — even though `load_wiki_corpus` drops
+        such hubs entirely, this filter catches any future regression in
+        the load-time gate. The model sees the same shape on
+        restricted-source vs unresolved-source entries.
+        """
         out: list[dict[str, str]] = []
         for pid in hub.synthesizes:
             page = self._by_page_id.get(str(pid))
@@ -110,7 +141,10 @@ class AgenticTools:
                     "source_url": page.source_url,
                 })
             else:
-                out.append({"page_id": str(pid), "title": "(unresolved)", "source_url": ""})
+                # Either restricted or genuinely missing. Don't leak either
+                # the title or the source_url; the agent does not need to
+                # know which case applies.
+                out.append({"page_id": str(pid), "title": "(not available)", "source_url": ""})
         return out
 
     # ---- tool definitions (Anthropic tool-use JSON schema) ------------------
@@ -326,9 +360,16 @@ class AgenticTools:
         if ident.isdigit():
             p = self._by_page_id.get(ident)
             if not p:
+                # Phase 1.1 Step 3 (ADR-0009): restricted and nonexistent
+                # share the same EXTERNAL message so the model can't
+                # distinguish them and exfiltrate "this page exists but I
+                # can't see it." The TRACE summary records the distinction
+                # for eval observability.
+                is_restricted = ident in self._restricted_raw_ids
+                summary = f"miss: raw {ident}" + (" (restricted)" if is_restricted else "")
                 return ToolResult(
                     text=f"ERROR: no raw page with page_id={ident!r}",
-                    summary=f"miss: raw {ident}",
+                    summary=summary,
                 )
             header = (
                 f"page_id: {p.page_id}\n"

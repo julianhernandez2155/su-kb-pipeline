@@ -101,7 +101,199 @@ queries:
     expected_topics: [Claude examples, study uses]
     expected_pages: ["511246346", "511279124", "500236296", "572194844", "516325410"]
 
+# -----------------------------------------------------------------------------
+# Step 7b expansion (2026-05-19): +25 queries to cover paraphrase, acronym/
+# abbreviation, negative/no-answer, cross-cutting, edge cases, and previously
+# uncovered raw pages (Claude Cowork, Clementine Class Search, Claude
+# Chat-vs-Code-vs-API). See research/kb-ingestion-project/next-phase-plan-v2.md
+# Step 7b. Negative queries use `expected_pages: []` + `expected_no_answer: true`
+# to mark that the corpus correctly does NOT cover the question; the
+# acceptance criterion for those is that the answer says so explicitly rather
+# than hallucinating.
+# -----------------------------------------------------------------------------
+
+  # --- Paraphrases of existing queries (intent-identical, wording-different) ---
+  - id: q16
+    type: paraphrase
+    question: "Can my conversations with Claude be used to train Anthropic's models?"
+    expected_topics: [model training, privacy]
+    expected_pages: ["488210484"]
+    paraphrase_of: q07
+
+  - id: q17
+    type: paraphrase
+    question: "Is it OK to put student grades into Claude if they're FERPA-protected?"
+    expected_topics: [data classification, FERPA, Claude]
+    expected_pages: ["488210484", "488144948"]
+    paraphrase_of: q01
+
+  - id: q18
+    type: paraphrase
+    question: "How can a Syracuse student get a Claude Enterprise account?"
+    expected_topics: [Claude access, signup]
+    expected_pages: ["534642749", "483525103"]
+    paraphrase_of: q05
+
+  - id: q19
+    type: paraphrase
+    question: "How does mentorAI differ from regular Claude.ai?"
+    expected_topics: [mentorAI, Claude comparison]
+    expected_pages: ["544505857", "567279621"]
+    paraphrase_of: q09
+
+  - id: q20
+    type: paraphrase
+    question: "Can I connect my SU OneDrive and Outlook to Claude?"
+    expected_topics: [M365, connectors, OneDrive, Outlook]
+    expected_pages: ["544210961", "841875458"]
+    paraphrase_of: q12
+
+  - id: q21
+    type: paraphrase
+    question: "Is NotebookLM available to Syracuse students and what can it do?"
+    expected_topics: [NotebookLM, Gemini]
+    expected_pages: ["530546723", "544538648"]
+    paraphrase_of: q13
+
+  # --- Acronym / abbreviation / shorthand ---
+  - id: q22
+    type: acronym
+    question: "What is MCP?"
+    expected_topics: [MCP, Model Context Protocol, connectors]
+    expected_pages: ["837517313", "841875458"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q23
+    type: acronym
+    question: "Can I use Co-pilot at SU?"  # note: "Co-pilot" with hyphen — common misspelling of "Copilot"
+    expected_topics: [Copilot, Microsoft]
+    expected_pages: ["522289260", "488144948"]
+
+  - id: q24
+    type: acronym
+    question: "Is M365 integration with Claude available?"
+    expected_topics: [M365, Microsoft 365, Claude connector]
+    expected_pages: ["544210961"]
+
+  - id: q25
+    type: acronym
+    question: "Does ITSAI provide guidance on data classification for AI tools?"
+    expected_topics: [data classification, approved tools, ITSAI]
+    expected_pages: ["488144948", "488210484"]
+
+  # --- Negative / no-answer (corpus correctly does NOT cover these) ---
+  # NOTE: q26 was originally authored as a negative, but Step 7b 2026-05-19
+  # surfaced that ChatGPT Teams IS on the SU Approved Tools list (see page
+  # 488144948). The query is therefore a *narrow lookup* — the model
+  # correctly cited 488144948 with "ChatGPT Teams is approved with access
+  # request." Kept here re-labeled as a `paraphrase` of q03's "what is
+  # approved" with a specific tool name.
+  - id: q26
+    type: paraphrase
+    question: "What's Syracuse's policy on using ChatGPT for academic work?"
+    expected_topics: [ChatGPT Teams, approved tools]
+    expected_pages: ["488144948"]
+
+  - id: q27
+    type: negative
+    question: "Is Perplexity AI an approved research tool at Syracuse?"
+    expected_topics: [Perplexity — not in approved corpus]
+    expected_pages: []
+    expected_no_answer: true
+
+  - id: q28
+    type: negative
+    question: "Does Syracuse support DeepSeek for student use?"
+    expected_topics: [DeepSeek — not in corpus]
+    expected_pages: []
+    expected_no_answer: true
+
+  - id: q29
+    type: negative
+    question: "What's the data retention policy for Claude Pro (the personal tier) at SU?"
+    expected_topics: [Claude Pro — personal tier not covered at SU]
+    expected_pages: []
+    expected_no_answer: true
+
+  # --- Cross-cutting (3+ pages, often benefit from wiki hubs) ---
+  - id: q30
+    type: cross-cutting
+    question: "What Claude features let me connect to data outside the chat window?"
+    expected_topics: [connectors, MCP, M365, SharePoint, Cowork]
+    expected_pages: ["544210961", "837517313", "841875458", "988774401"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q31
+    type: cross-cutting
+    question: "Which approved AI tools at SU let me upload files into a conversation?"
+    expected_topics: [file upload, Claude, Copilot, Gemini, NotebookLM]
+    expected_pages: ["488210484", "522289260", "498597967", "530546723"]
+    expected_to_benefit_from_wiki: true
+
+  - id: q32
+    type: cross-cutting
+    question: "Compare the example use cases offered for Claude and Gemini at Syracuse."
+    expected_topics: [example uses, Claude, Gemini, study workflows]
+    expected_pages: ["515801118", "572194844", "511279124", "516325410"]
+
+  - id: q33
+    type: cross-cutting
+    question: "What's the SU stance on using AI tools with confidential or restricted data?"
+    expected_topics: [data classification, approved tools, restricted data]
+    expected_pages: ["488144948", "488210484", "522289260", "498597967"]
+    expected_to_benefit_from_wiki: true
+
+  # --- Edge cases (very short / very long / typos) ---
+  - id: q34
+    type: edge-short
+    question: "Claude?"
+    expected_topics: [Claude — ambiguous; any reasonable Claude-anchored answer is acceptable]
+    expected_pages: ["534642749", "488210484", "522158118"]
+
+  - id: q35
+    type: edge-long
+    question: "I'm trying to set up Claude on my Windows laptop for my research work and I need to know all the steps including how to get access, install the developer tooling, configure my SU account, and verify that I can use it day-to-day — what do I need to do, end to end?"
+    expected_topics: [Claude setup, end-to-end onboarding]
+    expected_pages: ["534642749", "986841103", "540934169"]
+
+  - id: q36
+    type: edge-typo
+    question: "How do I instal Claud Code on Window?"  # typos: instal / Claud / Window
+    expected_topics: [Claude Code, installation]
+    expected_pages: ["986841103", "540934169"]
+
+  - id: q37
+    type: edge-typo-short
+    question: "approvd tols univ data"  # heavy typos, terse
+    expected_topics: [approved tools, university data]
+    expected_pages: ["488144948"]
+
+  # --- New-page coverage (raw pages the existing 15-query set never hit) ---
+  - id: q38
+    type: factual
+    question: "What is Claude Cowork and what are the security considerations?"
+    expected_topics: [Claude Cowork, desktop agent, security]
+    expected_pages: ["836698117"]
+
+  - id: q39
+    type: factual
+    question: "What is Clementine Class Search?"
+    expected_topics: [Clementine, Class Search]
+    expected_pages: ["895451142"]
+
+  - id: q40
+    type: synthesis
+    question: "What's the difference between Claude Chat, Claude Code, and the Claude API at SU?"
+    expected_topics: [Claude products, Chat vs Code vs API]
+    expected_pages: ["522158118", "986841103", "540934169"]
+    expected_to_benefit_from_wiki: true
+
 # Rubric for scoring each query (see next-phase-plan.md Step 3):
 #   ✅ Correct + complete — answer is right, all expected info present, citations point at real source pages
 #   ⚠️ Partial            — mostly right but missing a key piece, or citations adjacent-but-not-target
 #   ❌ Wrong / missing    — incorrect, fabricated, or "I don't know" when info exists in corpus
+#
+# For `expected_no_answer: true` queries the rubric flips:
+#   ✅ — answer explicitly says the corpus doesn't cover this (no hallucination)
+#   ⚠️ — answer says "doesn't cover" but adds speculation about the missing tool
+#   ❌ — answer fabricates policy / pretends the tool is covered

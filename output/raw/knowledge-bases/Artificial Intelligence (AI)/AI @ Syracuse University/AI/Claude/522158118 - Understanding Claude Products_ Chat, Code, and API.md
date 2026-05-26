@@ -3,6 +3,12 @@ page_id: '522158118'
 title: 'Understanding Claude Products: Chat, Code, and API'
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/522158118/Understanding+Claude+Products:+Chat,+Code,+and+API
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:cb17b376-03f7-4684-86e2-12021700639f
 contributors_count: 2
 content_hash: sha256:4e4f53e28ec19d30116d1d6bd8561be4c656ee5a0a16d38f313d204716fd29b4
-synced_at: '2026-05-13T16:55:39Z'
+synced_at: '2026-05-20T14:49:00Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 184
+days_since_modified: 190
 maintenance_signal: aging
+word_count: 512
+char_count: 3675
+token_estimate: 1050
+attachment_count: 0
 conversion_warnings: []
 ---
 

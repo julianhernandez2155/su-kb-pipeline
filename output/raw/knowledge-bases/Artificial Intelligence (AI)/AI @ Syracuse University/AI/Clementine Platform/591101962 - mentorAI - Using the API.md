@@ -3,6 +3,12 @@ page_id: '591101962'
 title: mentorAI - Using the API
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/591101962/mentorAI+-+Using+the+API
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -17,15 +23,20 @@ contributors:
 - 712020:4c323a6a-283a-4261-80da-1e662db12cda
 contributors_count: 1
 content_hash: sha256:0207e9a09c3b230164ce6bff8e482ffaf405f03b8d21616842734277aba253cf
-synced_at: '2026-05-13T16:56:06Z'
+synced_at: '2026-05-20T14:49:39Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 68
+days_since_modified: 75
 maintenance_signal: fresh
+word_count: 1728
+char_count: 13299
+token_estimate: 3800
+attachment_count: 2
 conversion_warnings: []
 ---
 

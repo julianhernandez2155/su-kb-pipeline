@@ -3,6 +3,12 @@ page_id: '572194844'
 title: AI Research Assistant with Claude
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/572194844/AI+Research+Assistant+with+Claude
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:c7102643-0a1c-4d26-bf2d-35eadbd37848
 contributors_count: 1
 content_hash: sha256:042dc7eaed48f8830428b0adf0d2aacb278d241d223fce460bcacb3294bf81b9
-synced_at: '2026-05-13T16:56:04Z'
+synced_at: '2026-05-20T14:49:36Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 183
+days_since_modified: 190
 maintenance_signal: aging
+word_count: 858
+char_count: 5631
+token_estimate: 1609
+attachment_count: 1
 conversion_warnings: []
 ---
 

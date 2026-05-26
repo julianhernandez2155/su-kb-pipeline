@@ -3,6 +3,12 @@ page_id: '544505857'
 title: mentorAI @ Syracuse University
 aliases: []
 source_url: https://answers.atlassian.syr.edu/wiki/spaces/ITSAI/pages/544505857/mentorAI+@+Syracuse+University
+visibility_signal: no_read_restrictions_seen
+restriction_check:
+- direct
+- ancestors
+- space
+restriction_source_ids: []
 space_key: ITSAI
 space_name: Artificial Intelligence (AI)
 space_type: knowledge_base
@@ -18,15 +24,20 @@ contributors:
 - 712020:882951bc-9249-4b41-8242-4d19030b3116
 contributors_count: 2
 content_hash: sha256:86858c07bf881afd444e9c3255ff47c37799b5c8cd0e8f854699f2e099f607f8
-synced_at: '2026-05-13T16:55:54Z'
+synced_at: '2026-05-20T14:49:22Z'
 last_sync_status: ok
 labels: []
+tags_original: []
 audience: null
 doc_type: null
 tools: []
 topics: []
-days_since_modified: 152
+days_since_modified: 159
 maintenance_signal: aging
+word_count: 214
+char_count: 1770
+token_estimate: 506
+attachment_count: 0
 conversion_warnings: []
 ---
 
