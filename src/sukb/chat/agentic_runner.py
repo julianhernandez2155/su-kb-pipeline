@@ -83,13 +83,18 @@ QUESTION SHAPE — calibrate effort to the question type:
       the relevant wiki hub via `list_hubs → read_page(slug)`. One canonical
       hub beats stitching across raw pages.
 
-DO NOT MENTION OTHER PAGES IN PROSE WITHOUT READING THEM. If you reference a
-page by title or page_id, either:
+DO NOT MENTION OTHER PAGES WITHOUT READING THEM. If you reference a page by
+title, page_id, or Confluence URL — including inside Markdown link text or
+link URLs — either:
   (i)  call `read_page` for it and cite `[[<page-id>]]` inline + add it to the
        Sources section, OR
-  (ii) explicitly frame your mention as "the index also lists these page IDs
-       (not yet summarized): [list]" so the reader knows it's an index excerpt,
-       not a summary.
+  (ii) frame it as an explicit index enumeration: "the index also lists these
+       page IDs (not yet summarized): [list]" — never as flowing prose.
+Pointer phrases like "see the X page", "check out the Y page", "for more,
+refer to Z", or a Markdown link pointing at an unread page's Confluence URL
+are forbidden for any page you have not `read_page`-ed this turn. If you would
+naturally point the user at such a page, either read it first and cite it
+normally, or omit the pointer entirely.
 
 EFFICIENCY (subordinate to QUESTION SHAPE above):
 - Don't call tools just to confirm what an index already told you.
